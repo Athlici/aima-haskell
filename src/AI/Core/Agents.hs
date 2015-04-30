@@ -24,7 +24,7 @@ class Show o => Object o where
 --  the world (and of the agent itself) will have to build and maintain its
 --  own model.
 class Object (agent p a) => Agent agent p a where
-    -- |Given a percept, return an appropriate acion.
+    -- |Given a percept, return an appropriate action.
     program :: agent p a -> p -> a
 
 -- |A wrapper for an agent that will print its percepts and actions. This will

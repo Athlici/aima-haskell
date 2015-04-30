@@ -237,7 +237,7 @@ minimaxFullSearchPlayer :: Game g s a => GamePlayerIO g s a
 minimaxFullSearchPlayer g s = return (minimaxSearch g s)
 
 -- |A player that uses minimax with a cutoff to make its move.
-minimaxPlayer :: Int -> Game g s a => GamePlayerIO g s a
+--minimaxPlayer :: Int -> Game g s a => GamePlayerIO g s a
 minimaxPlayer n g s = return (minimaxCutoff' n g s)
 
 -- |A player that uses full alpha/beta search to make its move.

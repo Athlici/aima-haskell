@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module AI.Logic.FOL where
 
 import Control.Monad.Error
