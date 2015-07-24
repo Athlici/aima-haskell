@@ -4,6 +4,7 @@ module AI.Search.Example.Sudoku where
 
 import Control.Monad
 import Data.Map (Map, (!))
+import Data.Text (pack, unpack, chunksOf)
 
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -65,4 +66,5 @@ demo = do
     forM_ sudokus $ \s -> case backtrackingSearch s fastOpts of
         Nothing  -> putStrLn "No solution found."
         Just sol -> do putStrLn "Solution found:"
+                       mapM_ (putStrLn.unpack) $ chunksOf 9 $ pack $ M.elems sol
                        print sol
