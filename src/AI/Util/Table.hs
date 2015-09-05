@@ -42,7 +42,7 @@ showTable pad xs header rownames =
 -- |Convert a single row of a table to a string, padding each cell so that 
 --  it is of uniform width.
 showRow :: Int -> String -> [String] -> String
-showRow pad sep xs = sep ++ (concatMap showCell cells)
+showRow pad sep xs = sep ++ concatMap showCell cells
     where
         trim pad str = let n = length str
                            m = max 0 (pad - n)

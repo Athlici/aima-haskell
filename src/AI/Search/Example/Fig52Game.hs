@@ -24,9 +24,7 @@ instance Game ExampleGame String Int where
     toMove g "A" = Max
     toMove g  _  = Min
 
-    legalMoves _ s = case s `elem` ["A","B","C","D"] of
-        True  -> [1,2,3]
-        False -> []
+    legalMoves _ s = if s `elem` ["A","B","C","D"] then [1,2,3] else []
 
     makeMove _ n "A" = ["B","C","D"] !! (n-1)
     makeMove _ n "B" = ["B1","B2","B3"] !! (n-1)
@@ -39,6 +37,4 @@ instance Game ExampleGame String Int where
                                   , ("C1", 2), ("C2", 4), ("C3", 6)
                                   , ("D1",14), ("D2", 5), ("D3", 2) ]
 
-    terminalTest t s = if s `elem` ["B1","B2","B3","C1","C2","C3","D1","D2","D3"]
-        then True
-        else False
+    terminalTest _ s = s `elem` ["B1","B2","B3","C1","C2","C3","D1","D2","D3"]

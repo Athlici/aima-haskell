@@ -4,7 +4,7 @@ module AI.Logic.FOL where
 
 import Control.Monad.Error
 import Data.Map (Map, (!))
-import Data.Maybe (catMaybes)
+import Data.Maybe (mapMaybe)
 import Data.Unique
 import System.IO.Unsafe
 import Text.ParserCombinators.Parsec
@@ -45,8 +45,8 @@ instance Show FOLExpr where
     show (Val True)    = "T"
     show (Val False)   = "F"
     show (Not p)       = "~" ++ show p
-    show (And ps)      = "(" ++ (concat $ L.intersperse " & " $ map show ps) ++ ")"
-    show (Or ps)       = "(" ++ (concat $ L.intersperse " | " $ map show ps) ++ ")"
+    show (And ps)      = "(" ++ L.intercalate " & " (map show ps) ++ ")"
+    show (Or ps)       = "(" ++ L.intercalate " | " (map show ps) ++ ")"
     show (Implies p q) = "(" ++ show p ++ " => " ++ show q ++ ")"
     show (ForAll x p)  = "forall " ++ x ++ ". " ++ show p
     show (Exists x p)  = "exists " ++ x ++ ". " ++ show p
@@ -142,13 +142,13 @@ instance Show Statement where
 instance Show DefiniteClause where
     show (DC []    conc) = show conc
     show (DC prems conc) =
-        concat (L.intersperse " & " $ map show prems) ++ " => " ++ show conc
+        L.intercalate " & " (map show prems) ++ " => " ++ show conc
 
 isFact :: DefiniteClause -> Bool
 isFact = null . premises
 
 toFact :: Statement -> DefiniteClause
-toFact s = DC [] s
+toFact = DC []
 
 facts :: [DefiniteClause] -> [Statement]
 facts = map conclusion . filter isFact
@@ -234,10 +234,10 @@ fc kb a = unsafePerformIO $ go (facts kb) (rules kb)
                     Just r  -> r:result
 
 isRenaming :: Statement -> [Statement] -> Bool
-isRenaming s kb = notNull $ catMaybes $ map (stUnify [s]) (map return kb)
+isRenaming s kb = notNull $ mapMaybe (stUnify [s] . return) kb
 
 getSubstitutions :: [Statement] -> [Statement] -> [Map String Term]
-getSubstitutions ps kb = catMaybes $ map (stUnify ps) (subsets kb)
+getSubstitutions ps kb = mapMaybe (stUnify ps) (subsets kb)
           
 ----------------------
 -- Rename Variables --
@@ -329,10 +329,10 @@ getRest _          = error "Not a list -- AI.Logic.FOL.getRest"
 --  appear in a consistent order, and avoid having to write a more complicated
 --  AC- or ACU-unification routine.
 associate :: FOLExpr -> FOLExpr
-associate (And ps) = And $ L.sort $ foldr f [] (map associate ps)
+associate (And ps) = And $ L.sort $ foldr (f . associate) [] ps
     where f (And xs) ys = xs ++ ys
           f expr ys     = expr : ys
-associate (Or ps)  = Or  $ L.sort $ foldr f [] (map associate ps)
+associate (Or ps)  = Or  $ L.sort $ foldr (f . associate) [] ps
     where f (Or xs) ys = xs ++ ys
           f expr ys    = expr : ys
 associate (Not p)       = Not (associate p)

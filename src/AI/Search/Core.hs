@@ -77,6 +77,13 @@ class Eq s => Problem p s a where
     valueP :: p s a -> s -> Double
     valueP _ = const 0
 
+-- |Extending the Problem Class for bidirectional Problems
+class Problem p s a => BidirProblem p s a where
+    -- | Inverse function for successor, returns the generating nodes.
+    precessor :: p s a -> s -> [(a,s)]
+
+    -- goalTest?
+
 -- |A node in a search tree. It contains a reference to its parent (the node
 --  that this is a successor of) and to the state for this node. Note that if
 --  a state can be arrived at by two paths, there will be two nodes with the
@@ -111,7 +118,7 @@ expand :: (Problem p s a) => p s a -> Node s a -> [Node s a]
 expand p node = [ mkNode a s | (a,s) <- successor p (state node) ]
     where
         mkNode a s = Node s (Just node) (Just a) (c a s) (1 + depth node) v
-        c      a s = costP p (cost node) (state node) a s
+        c          = costP p (cost node) (state node)
         v          = valueP p (state node)
 
 ----------------------------
@@ -148,13 +155,13 @@ graphSearch q prob = listToMaybe $ genericSearch f q prob
 
 genericSearch :: (Queue q, Problem p s a) =>
                        (Node s a -> S.Set a1 -> ([Node s a], S.Set a1))
-                       -> q (Node s a) -> p s a -> [(Node s a)]
+                       -> q (Node s a) -> p s a -> [Node s a]
 genericSearch f q prob = findFinalState  (genericSearchPath f (root prob `push` q))
     where 
         findFinalState = filter  (goalTest prob.state) 
 
 -- Return a (potentially infinite) list of nodes to search.
--- Since the reult is lazy, you can break out early if you find a resut. 
+-- Since the result is lazy, you can break out early if you find a result. 
 genericSearchPath :: Queue q => (a -> S.Set a1 -> ([a], S.Set a1)) -> q a -> [a]
 genericSearchPath f q  = go (q,S.empty)
     where
@@ -162,7 +169,7 @@ genericSearchPath f q  = go (q,S.empty)
             | empty fringe = []
             | otherwise = go'  (pop fringe) closed
     go' (node, rest) closed
-            | (new,closed') <-(f node closed) = node : go (new `extend` rest, closed')
+            | (new,closed') <- f node closed = node : go (new `extend` rest, closed')
 
 
 -----------------------

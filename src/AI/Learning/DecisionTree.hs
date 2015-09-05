@@ -1,5 +1,5 @@
-{-# LANGUAGE ScopedTypeVariables, BangPatterns#-}
---, FlexibleContexts, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+--,Bang Patterns, FlexibleContexts, UndecidableInstances #-}
 
 module AI.Learning.DecisionTree where
 
@@ -46,7 +46,7 @@ instance Functor (DTree a i) where
     fmap f (Decision att i branches) = Decision att i (fmap (fmap f) branches)
 
 instance Applicative (DTree a i) where
-    pure b = Result b
+    pure = Result
 
 --Applicative (DTree a i) =>
 instance Monad (DTree a i) where

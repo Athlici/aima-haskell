@@ -22,7 +22,7 @@ instance CSP Sudoku String Char where
     vars s = squares
     domains (Sudoku dom) = dom
     neighbours s = M.fromList peers
-    constraints s x xv y yv = (xv /= yv) || not (x `elem` neighbours s ! y)
+    constraints s x xv y yv = (xv /= yv) || notElem x (neighbours s ! y)
         
         
 

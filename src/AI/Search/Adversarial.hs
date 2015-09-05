@@ -321,9 +321,10 @@ playGameIO game p1 p2 = go (initial game)
             return state
             where
                 util   = utility game state Max
-                result = if util == 0 then "Draw" else if util > 0
-                    then "Player 1 Wins"
-                    else "Player 2 Wins"
+                result
+                  | util == 0 = "Draw"
+                  | util  > 0 = "Player 1 Wins"
+                  | otherwise = "Player 2 Wins"
 
         playRound state = do
             putStrLn "Current state is:" >> print state
@@ -357,12 +358,12 @@ mkGameIO g = do
 -- |Make GameIO into an instance of Game.
 instance (Game g s a) => Game (GameIO g) s a where
     initial      (GIO g _ _ _) = initial g
-    toMove       (GIO g _ _ _) s = toMove g s
-    legalMoves   (GIO g _ _ _) s = legalMoves g s
-    makeMove     (GIO g _ _ v) a s = makeMove g a s
-    utility      (GIO g _ _ _) s p = utility g s p
-    sortMoves    (GIO g _ _ _) as  = sortMoves g as
-    heuristic    (GIO g _ _ _) s p = heuristic g s p
+    toMove       (GIO g _ _ _) = toMove g
+    legalMoves   (GIO g _ _ _) = legalMoves g
+    makeMove     (GIO g _ _ _) = makeMove g
+    utility      (GIO g _ _ _) = utility g
+    sortMoves    (GIO g _ _ _) = sortMoves g
+    heuristic    (GIO g _ _ _) = heuristic g
 
     terminalTest (GIO g i _ _) s = unsafePerformIO $ do
         modifyIORef i (+1)

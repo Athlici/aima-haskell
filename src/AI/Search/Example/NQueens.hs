@@ -26,12 +26,10 @@ conflict r1 c1 r2 c2 =
 
 -- |Would placing a queen at (row,col) conflict with anything?
 conflicted :: [Maybe Int] -> Int -> Int -> Bool
-conflicted state row col = or $ map f (enumerate state)
+conflicted state row col = any f (enumerate state)
     where
         f (_, Nothing) = False
-        f (c, Just r)  = if c == col && r == row
-            then False
-            else conflict row col r c
+        f (c, Just r)  = not (c == col && r == row) && conflict row col r c
 
 -- |N-Queens is an instance of Problem. 
 instance Problem NQueens [Maybe Int] (Int,Int) where

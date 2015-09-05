@@ -150,7 +150,7 @@ argMinList xs f = map (xs!!) indices
     where
         ys      = map f xs
         minVal  = minimum ys
-        indices = L.findIndices (== minVal) ys
+        indices = L.elemIndices minVal ys
 
 -- |Return the element of a list that minimizes a function. In case of a tie,
 --  choose randomly with the given generator.
@@ -186,7 +186,7 @@ listToFunction xs = (M.fromList xs !)
 
 -- |Transpose a list of lists.
 transpose :: [[a]] -> [[a]]
-transpose xs = if or (map null xs)
+transpose xs = if any null xs
     then []
     else let heads = map head xs
              tails = map tail xs
@@ -233,7 +233,7 @@ strip = rstrip . lstrip
 
 -- |Join a list of strings, separating them with commas.
 commaSep :: [String] -> String
-commaSep xs = concat $ L.intersperse "," xs
+commaSep xs = L.intercalate "," xs
 
 -------------------
 -- Map Functions --
@@ -259,14 +259,13 @@ ifM test a b = test >>= \p -> if p then a else b
 untilM :: Monad m => (t -> Bool) -> m t -> (t -> m ()) -> m ()
 untilM predicate prompt action = do
     result <- prompt
-    if predicate result
-        then return ()
-        else action result >> untilM predicate prompt action
+    unless (predicate result) $
+        action result >> untilM predicate prompt action
 
 -- |Run a computation, ignoring the result (i.e. run it only for its side
 --  effects).
 ignoreResult :: Monad m => m a -> m ()
-ignoreResult c = c >> return ()
+ignoreResult c = void c
 
 -- |Ensure that a monadic computation doesn't throw any errors.
 trapError :: MonadError e m => m () -> m ()
@@ -336,13 +335,11 @@ randomChoiceIO xs = getStdGen >>= \g -> return $ fst $ randomChoice g xs
 
 -- |Given a random number generator, return 'True' with probability p.
 probability :: (RandomGen g, Random a, Ord a, Num a) => g -> a -> (Bool, g)
-probability g p = if p' < p then (True, g') else (False, g')
-    where
-        (p', g') = R.randomR (0,1) g
+probability g p = let (p', g') = R.randomR (0,1) g in (p' < p, g')
 
 -- |Return @True@ with probability p.
 probabilityIO :: (R.Random a, Ord a, Num a) => a -> IO Bool
-probabilityIO p = randomIO >>= \q -> return $! if q < p then True else False
+probabilityIO p = randomIO >>= \q -> return $! (q < p)
 
 --------------------
 -- IO Combinators -- 

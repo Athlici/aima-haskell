@@ -102,7 +102,7 @@ eliminationAsk bn fixed e = go [] (reverse $ bnVars bn)
         go factors []     = let f = pointwiseProduct factors
                             in normalize $ D $ zip [True,False] (fVals f)
 
-        go factors (v:vs) = let factors' = (mkFactor bn fixed v) : factors
+        go factors (v:vs) = let factors' = mkFactor bn fixed v : factors
                             in if v `elem` hidden
                                 then go [sumOut v factors'] vs
                                 else go factors' vs
@@ -155,7 +155,7 @@ addF (Factor vs1 ps1) (Factor vs2 ps2) = if vs1 /= vs2
 -- |Take a slice of a factor by setting one of its variables to a fixed value.
 --  This is a helper function for 'sumOut'.
 set :: Eq e => e -> Bool -> Factor e -> Factor e
-set e x (Factor vs ps) = if not (e `elem` vs)
+set e x (Factor vs ps) = if notElem e vs
                             then Factor vs ps
                             else Factor (L.delete e vs) (subSlice1 ps (i,x))
                             where

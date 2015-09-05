@@ -92,7 +92,7 @@ parseGraph str = toUndirectedGraph $ textToStr $ splitNbrs $
                  parseNodes $ splitNodes $ T.pack str
     where
         splitNodes = map T.strip . T.split (== ';')
-        parseNodes = map listToPair . map (T.split (== ':'))
+        parseNodes = map (listToPair . T.split (== ':'))
         splitNbrs  = map (\(x,y) -> (x, T.words y))
         textToStr  = map (\(x,y) -> (T.unpack x, map T.unpack y))
         listToPair [x,y] = (x,y)

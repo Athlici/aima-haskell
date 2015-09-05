@@ -32,10 +32,10 @@ connect4 = C (TTT 7 6 4)
 --  the set of legal moves, the fact that it sorts moves so that those closest
 --  to the center are considered first, and the heuristic function.
 instance Game Connect4 C4State C4Move where
-    initial      (C g)        = initial g
-    toMove       (C g) s      = toMove g s
-    utility      (C g) s p    = utility g s p
-    terminalTest (C g) s      = terminalTest g s
+    initial      (C g) = initial g
+    toMove       (C g) = toMove g
+    utility      (C g) = utility g
+    terminalTest (C g) = terminalTest g
 
     makeMove     (C g) col s  = let row = lowestUnoccupied (col-1) s
                                 in makeMove g (col-1, row) s
@@ -53,7 +53,7 @@ lowestUnoccupied :: Int -> TTState -> Int
 lowestUnoccupied col (TTS board _ _ (_,v,_)) = 
     let coords   = map (\row -> (col,row)) [0..v-1]
         counters = map (`M.lookup` board) coords
-    in (countIf (/=Nothing) counters)
+    in countIf (/=Nothing) counters
 
 -- |Play a game of Connect 4 against an opponent using alpha/beta search.
 demo :: IO ()

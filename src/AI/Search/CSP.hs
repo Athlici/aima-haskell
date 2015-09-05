@@ -93,7 +93,7 @@ forwardCheck csp var val = do
     -- Prune any other assignment that conflicts with var = val.
     forM_ (neighbours csp ! var) $ \x -> when (x `M.notMember` assgn) $
         do dom <- getDomain
-           forM_ (dom ! x) $ \y -> when (not $ constraints csp var val x y) $
+           forM_ (dom ! x) $ \y -> unless (constraints csp var val x y) $
                 do modifyDomain (prune y)
                    modifyPruned (add x y)
     where
@@ -114,7 +114,7 @@ allAssigned csp assignment = M.size assignment == length (vars csp)
 hasConflicts :: CSP c v a => c v a -> v -> a -> Assignment v a -> Bool
 hasConflicts  csp v a  = not . M.null . M.filterWithKey conflict 
     where
-        conflict x y = not $constraints csp v a x y
+        conflict x y = not $ constraints csp v a x y
 
 -- |Return the number of conflicts that v == a has with other
 --  viables currently assigned.
@@ -122,7 +122,7 @@ numConflicts :: CSP c v a => c v a -> v -> a -> Assignment v a -> Int
 numConflicts csp v a assignment = M.foldWithKey count 0 assignment
     where
         ok = constraints csp v a
-        count k v n  = if ok k v then n else (n+1)
+        count k v n  = if ok k v then n else n+1
 
 
 -- |The goal is to assign all vars with all constraints satisfied.
@@ -196,7 +196,7 @@ mostConstrained vs = do
     dom   <- getDomain
     assgn <- getAssignment
     let unassigned = [ v | v <- vs, v `M.notMember` assgn ]
-    return $! (argMin unassigned $ numLegalValues dom)
+    return $! argMin unassigned (numLegalValues dom)
     
 
 
@@ -264,10 +264,10 @@ removeInconsistentValues csp x y = getDomain >>= \dom -> do
 
     let old = dom ! x
         new = filter fun old
-        fun xv = any (\yv -> constraints csp x xv y yv) (dom ! y)
+        fun xv = any (constraints csp x xv y) (dom ! y)
 
     if length new < length old
-        then (modifyDomain $ M.insert x new) >> return True
+        then modifyDomain (M.insert x new) >> return True
         else return False
 
 ---------------------------------------

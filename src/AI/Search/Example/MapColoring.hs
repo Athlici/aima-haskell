@@ -17,7 +17,7 @@ import qualified AI.Util.Graph as G
 
 data MapColoringCSP v a = MCP
     { neighboursMC :: Graph String
-    , colorsMC :: [Char] } deriving (Show)
+    , colorsMC :: String } deriving (Show)
 
 instance CSP MapColoringCSP String Char where
     vars (MCP nbrs _) = M.keys nbrs
@@ -26,7 +26,7 @@ instance CSP MapColoringCSP String Char where
 
     neighbours (MCP nbrs _) = nbrs
 
-    constraints csp x xv y yv =  xv /=yv || not (y `elem` neighbours csp ! x)
+    constraints csp x xv y yv =  xv /=yv || notElem y (neighbours csp ! x)
         
         
 
@@ -37,7 +37,7 @@ instance CSP MapColoringCSP String Char where
 australia :: MapColoringCSP String Char
 australia = MCP territories "RGB"
     where
-        territories = G.toGraph $
+        territories = G.toGraph
             [ ("SA",  ["WA","NT","Q","NSW","V"])
             , ("NT",  ["WA","Q","SA"])
             , ("NSW", ["Q","V","SA"])

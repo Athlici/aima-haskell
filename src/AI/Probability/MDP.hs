@@ -72,7 +72,7 @@ valueIteration mdp epsilon = bestPolicy mdp $ go (const 0.0)
         go u = if delta < epsilon * (1 - gamma) / gamma then u1 else go u1
             where
                 delta = maximum [ abs (u1 s - u s) | s <- states ]
-                u1    = listToFunction $ [ (s,f s) | s <- states ]
+                u1    = listToFunction [ (s,f s) | s <- states ]
                 f s   = reward mdp s + gamma * maximum (g s)
                 g s   = [ expectedUtility mdp u s a | a <- actions mdp s ]
 
@@ -83,7 +83,7 @@ valueIteration mdp epsilon = bestPolicy mdp $ go (const 0.0)
 policyIteration :: (Eq a, MDP m s a) =>
                    m s a        -- ^ Problem to be solved
                 -> Policy s a   -- ^ Final policy
-policyIteration mdp = go (\s -> head (actions mdp s)) (const 0)
+policyIteration mdp = go (head . actions mdp) (const 0)
     where
         go p u = if unchanged then p else go p1 u1
             where

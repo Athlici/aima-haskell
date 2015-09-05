@@ -179,7 +179,7 @@ actualTree = do
                 then return True
                 else do
                   raining <- attribute rain "Rain"
-                  return (if raining then True else False)
+                  return raining
         Med   -> do
           alternative <- attribute alt "Alternative"
           if not alternative
@@ -189,10 +189,10 @@ actualTree = do
                 then return True
                 else do
                   hasBar <- attribute bar "Bar"
-                  return (if hasBar then True else False)
+                  return hasBar
             else do
               friday <- attribute fri "Fri/Sat"
-              return (if friday then True else False)
+              return friday
         Long  -> return False
 
 ------------------------------------------

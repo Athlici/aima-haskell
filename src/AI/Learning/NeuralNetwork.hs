@@ -103,7 +103,7 @@ nnForwardProp :: NeuralNetwork                                 -- neural net
               -> Matrix Double                                 -- design matrix (x)
               -> (Matrix Double, Matrix Double, Matrix Double) -- results of fwd prop
 nnForwardProp (NN theta0 theta1) x = (a0,a1,a2)
-    where a0 = addOnes $ x
+    where a0 = addOnes x
           a1 = addOnes $ sigmoid (a0 <> theta0)
           a2 = sigmoid (a1 <> theta1)
 

@@ -106,11 +106,11 @@ kInARow' (TTS board _ _ (_,_,k)) (x,y) p (dx,dy) = n1 + n2 - 1 >= k
 -- |The Show instance for 'TTState' creates a human-readable representation of
 --  the board.
 instance Show TTState where
-    show s = concat $ concat $ L.intersperse [row] $
+    show s = concat $ L.intercalate [row] $
                 map ((++["\n"]) . L.intersperse "|") (toChars s)
         where
             (h,_,_) = limsTT s
-            row = (concat $ replicate (h-1) "---+") ++ "---\n"
+            row = concat (replicate (h-1) "---+") ++ "---\n"
 
 -- |A helper function for @Show TTState@ that converts each position on the
 --  board to its @Char@ representation.
@@ -158,7 +158,7 @@ isThreat s@(TTS board _ _ _) p (x,y) =
 
 -- |Return @True@ if a line of pieces is a winning line.
 isWinningLine :: TTCounter -> [Maybe TTCounter] -> Bool
-isWinningLine c xs = c `elem` ys && not (other c `elem` ys)
+isWinningLine c xs = c `elem` ys && notElem (other c) ys
     where
         ys = catMaybes xs
 

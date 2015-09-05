@@ -24,7 +24,7 @@ gradientDescent g x0 alpha tol = go x0 (fun x0)
                     then x'
                     else go x' (fun x')
         converged a b = norm b / norm a - 1 < tol
-        fun x = gradientDescentStep g alpha x
+        fun = gradientDescentStep g alpha
 
 gradientDescentStep :: (Vector Double -> Vector Double) -> Double -> Vector Double -> Vector Double
 gradientDescentStep g alpha x = x - alpha `scale` g x

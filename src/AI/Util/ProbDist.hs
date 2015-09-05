@@ -20,7 +20,7 @@ instance Functor Dist where
 
 instance Applicative Dist where
     pure x = D [(x,1)]
-    (D fs) <*> (D xs) = D $ [ (f x,p*q) | (f,q) <- fs, (x,p) <- xs ]
+    (D fs) <*> (D xs) = D [ (f x,p*q) | (f,q) <- fs, (x,p) <- xs ]
 
 instance Monad Dist where
     return x = D [(x,1)]
@@ -99,7 +99,7 @@ condition False = D []
 -------------------
 
 instance Show a => Show (Dist a) where
-    show (D xs) = concat $ L.intersperse "\n" $ map disp xs
+    show (D xs) = L.intercalate "\n" (map disp xs)
         where
             disp (x,p) = show x ++ replicate (pad x) ' ' ++ showProb p
             pad x      = n - length (show x) + 2
@@ -151,7 +151,7 @@ instance ToFloat Integer where
 --
 --  This is only defined for distributions over data that can be cast to Float.
 expectation :: ToFloat a => Dist a -> Prob
-expectation (D xs) = sum $ [ toFloat x * p | (x,p) <- xs ]
+expectation (D xs) = sum [ toFloat x * p | (x,p) <- xs ]
 
 -- |Compute the entropy of a distribution, returning the result in /nats/.
 --  Note that it is necessary to collect like results first, to ensure that

@@ -96,7 +96,7 @@ loop = untilM (== "quit") (liftIO readPrompt) (trapError . dispatch)
 -- |Decide what to do with user input to a theorem prover.
 dispatch :: KB k p t => String -> Logic (k p t) ()
 dispatch str = case cmd of
-    "show"      -> get >>= (\kb -> liftIO $ showPremises kb)
+    "show"      -> get >>= (liftIO . showPremises)
     "help"      -> liftIO showHelp
     "tell"      -> parse rest >>= tellKB
     "ask"       -> parse rest >>= askKB
@@ -117,7 +117,7 @@ parse str = case parseExpr (strip str) of
 
 -- |Store a new premise in the knowledge base.
 tellKB :: KB k p t => p -> Logic (k p t) ()
-tellKB expr = modify (\kb -> tell kb expr)
+tellKB expr = modify (`tell` expr)
 
 -- |Query the knowledge base.
 askKB :: KB k p t => p -> Logic (k p t) ()

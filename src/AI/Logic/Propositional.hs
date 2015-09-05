@@ -37,8 +37,8 @@ instance Show PLExpr where
     show (Val False)   = "F"
     show (Var p)       = p
     show (Not p)       = "~" ++ show p
-    show (And ps)      = "(" ++ (concat $ L.intersperse " & " $ map show ps) ++ ")"
-    show (Or ps)       = "(" ++ (concat $ L.intersperse " | " $ map show ps) ++ ")"
+    show (And ps)      = "(" ++ L.intercalate " & " (map show ps) ++ ")"
+    show (Or ps)       = "(" ++ L.intercalate " | " (map show ps) ++ ")"
     show (Implies p q) = "(" ++ show p ++ " => " ++ show q ++ ")"
     show (Equiv p q)   = "(" ++ show p ++ " <=> " ++ show q ++ ")"
 
@@ -88,9 +88,7 @@ instance KB DefClauseKB DefiniteClause Bool where
     empty             = DC []
     tell    (DC cs) c = DC $ cs ++ [c]
     retract (DC cs) c = DC $ L.delete c cs
-    ask     (DC cs) c = if isFact c
-        then fcEntails cs (conclusion c)
-        else False
+    ask     (DC cs) c = isFact c && fcEntails cs (conclusion c)
     askVars           = undefined
     axioms  (DC cs)   = cs 
 
@@ -172,9 +170,9 @@ ttFalse s = s `ttEntails` false
 plTrue :: [(String,Bool)] -> PLExpr -> Maybe Bool
 plTrue model (Val b)  = Just b
 plTrue model (Var p)  = lookup p model
-plTrue model (Not p)  = not <$> (plTrue model p)
-plTrue model (And ps) = and <$> (mapM (plTrue model) ps)
-plTrue model (Or ps)  = or  <$> (mapM (plTrue model) ps)
+plTrue model (Not p)  = not <$> plTrue model p
+plTrue model (And ps) = and <$> mapM (plTrue model) ps
+plTrue model (Or ps)  = or  <$> mapM (plTrue model) ps
 plTrue model (Implies p q) = do
     x <- plTrue model p
     y <- plTrue model q
@@ -234,10 +232,10 @@ distributeAndOverOr expr     = expr
 -- |Reduce an expression to associative form, i.e. flatten out all nested lists
 --  of And and Or.
 associate :: PLExpr -> PLExpr
-associate (And ps) = And $ foldr f [] (map associate ps)
+associate (And ps) = And $ foldr (f . associate) [] ps
     where f (And xs) ys = xs ++ ys
           f expr ys     = expr : ys
-associate (Or ps)  = Or  $ foldr f [] (map associate ps)
+associate (Or ps)  = Or  $ foldr (f . associate) [] ps
     where f (Or xs) ys = xs ++ ys
           f expr ys    = expr : ys
 associate (Not p) = Not (associate p)
@@ -259,7 +257,7 @@ complementary _ _       = False
 --  tautology without need of evaluation - this is the case if it contains two
 --  complementary literals.
 isTautology :: PLExpr -> Bool
-isTautology expr = or $ map (uncurry complementary) clausePairs
+isTautology expr = any (uncurry complementary) clausePairs
     where
         clausePairs = unorderedPairs (disjuncts expr)
 
@@ -272,12 +270,10 @@ isTautology expr = or $ map (uncurry complementary) clausePairs
 plResolution :: PLExpr -> PLExpr -> Bool
 plResolution s t = go $ conjuncts $ toCnf $ And [s, Not t]
     where
-        go clauses = if contradictionDerived
-            then True
-            else if new `isSubSet` clauses
-                then False
-                else go (L.union clauses new)
-
+        go clauses
+          | contradictionDerived = True
+          | new `isSubSet` clauses = False
+          | otherwise = go (L.union clauses new)
             where
                 (contradictionDerived, new) =
                     foldr resolve (False, []) (unorderedPairs clauses)
@@ -313,7 +309,7 @@ data DefiniteClause = DefiniteClause { premises :: [Symbol]
 instance Show DefiniteClause where
     show (DefiniteClause []   hd) = hd 
     show (DefiniteClause body hd) =
-        (concat $ L.intersperse " & " body) ++ " => " ++ hd
+        L.intercalate " & " body ++ " => " ++ hd
 
 toDefiniteClause :: PLExpr -> ThrowsError DefiniteClause
 toDefiniteClause (Val x) = return $ DefiniteClause [] (show x)
@@ -344,19 +340,17 @@ fcEntails :: [DefiniteClause] -> Symbol -> Bool
 fcEntails kb q = go initialCount [] (facts kb)
     where
         go count inferred []     = False
-        go count inferred (p:ps) = if p == q
-            then True
-            else if p `elem` inferred
-                    then go count inferred ps
-                    else go count' (p:inferred) agenda'
-                        where (count', agenda') = run kb p count ps
+        go count inferred (p : ps)
+          | p == q = True
+          | p `elem` inferred = go count inferred ps
+          | otherwise = go count' (p : inferred) agenda'
+            where (count', agenda') = run kb p count ps
 
         run []     p count agenda = (count, agenda)
-        run (c:cs) p count agenda = if not (p `elem` premises c)
-            then run cs p count agenda
-            else if n == 1
-                    then run cs p count' (conclusion c:agenda)
-                    else run cs p count' agenda
+        run (c : cs) p count agenda
+          | notElem p (premises c) = run cs p count agenda
+          | n == 1    = run cs p count' (conclusion c : agenda)
+          | otherwise = run cs p count' agenda
             where
                 n    = count ! c
                 count' = M.insert c (n-1) count

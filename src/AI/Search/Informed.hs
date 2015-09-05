@@ -3,6 +3,8 @@ module AI.Search.Informed where
 import AI.Search.Core
 import AI.Util.Queue
 
+infinity = 1/0
+
 ---------------------------------
 -- Informed (Heuristic) Search --
 ---------------------------------
@@ -52,3 +54,12 @@ aStarSearch h = bestFirstGraphSearch (\n -> h n + cost n)
 --  problem.
 aStarSearch' :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
 aStarSearch' prob = aStarSearch (heuristic prob) prob
+
+--recursiveBestFirstSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
+--recursiveBestFirstSearch prob = eithertoMaybe $ RBFS prob (root prob) infinity where
+--    eithertoMaybe (Left  n) = Just n
+--    eithertoMaybe (Right _) = Nothing
+--    RBFS prob n f
+--        | goalTest prob n = Left n
+--        | null (expand prob n) = Right infinity
+--        | otherwise = 
