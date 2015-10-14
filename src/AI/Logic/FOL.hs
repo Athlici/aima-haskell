@@ -2,7 +2,7 @@
 
 module AI.Logic.FOL where
 
-import Control.Monad.Error
+import Control.Monad.Except
 import Data.Map (Map, (!))
 import Data.Maybe (mapMaybe)
 import Data.Unique

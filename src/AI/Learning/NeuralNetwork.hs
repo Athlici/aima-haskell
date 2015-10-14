@@ -47,7 +47,7 @@ fromVector (k,h,l) vec = NN theta0 theta1
           theta1 = reshape l $ dropVector ((k + 1) * h) vec
 
 toVector :: Matrix Double -> Matrix Double -> Vector Double
-toVector theta0 theta1 = join [flatten theta0, flatten theta1]
+toVector theta0 theta1 = vjoin [flatten theta0, flatten theta1]
 
 ----------------------
 -- NN Train/Predict --

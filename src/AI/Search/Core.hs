@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, PatternGuards #-}
 
 module AI.Search.Core (
     -- * Core classes and data structures
@@ -169,7 +169,7 @@ genericSearchPath f q  = go (q,S.empty)
             | empty fringe = []
             | otherwise = go'  (pop fringe) closed
     go' (node, rest) closed
-            | (new,closed') <- f node closed = node : go (new `extend` rest, closed')
+            | (new,closed') <- f node closed = node : go (new `extend` rest, closed')  --What is happening here?
 
 
 -----------------------

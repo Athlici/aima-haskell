@@ -38,8 +38,8 @@ Library
                         MonadRandom,
                         array,
                         gnuplot,
-                        hmatrix,
-                        hmatrix-gsl,
+                        hmatrix     == 0.16.1.5,
+                        hmatrix-gsl == 0.16.0.3,
                         QuickCheck
     Exposed-Modules:    AI.Core.Agents
                         AI.Search.Core

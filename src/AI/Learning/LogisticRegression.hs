@@ -72,7 +72,7 @@ lrLogLikRegularized y x useConst lambda theta = (cost, grad)
     where
         m      = fromIntegral (rows x)
         (c,g)  = lrLogLikelihood y x theta
-        theta' = if useConst then join [0, dropVector 1 theta] else theta
+        theta' = if useConst then vjoin [0, dropVector 1 theta] else theta
         cost   = c - (lambda / (2 * m)) * norm theta' ^ 2
         grad   = g - (lambda / m) `scale` theta'
 

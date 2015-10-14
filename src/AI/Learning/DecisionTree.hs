@@ -4,6 +4,7 @@
 module AI.Learning.DecisionTree where
 
 import Control.Monad.Random
+import Control.Monad (ap)
 import Data.Map (Map, (!))
 import Data.Ord (comparing)
 import qualified Data.List as L
@@ -46,11 +47,10 @@ instance Functor (DTree a i) where
     fmap f (Decision att i branches) = Decision att i (fmap (fmap f) branches)
 
 instance Applicative (DTree a i) where
-    pure = Result
+    pure  = Result
+    (<*>) = ap
 
---Applicative (DTree a i) =>
 instance Monad (DTree a i) where
---    return b = Result b
     Result b          >>= f = f b
     Decision att i ts >>= f = Decision att i (fmap (>>=f) ts)
 

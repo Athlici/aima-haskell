@@ -10,7 +10,7 @@ import qualified System.Random as R
 import Control.Concurrent.STM
 import Control.DeepSeq
 import Control.Monad
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Monad.Random
 import Data.Map (Map, (!))
 import System.CPUTime

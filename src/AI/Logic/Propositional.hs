@@ -3,7 +3,7 @@
 module AI.Logic.Propositional where
 
 import Control.Applicative ((<$>))
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Monad.State
 import Data.Map (Map, (!))
 import Text.ParserCombinators.Parsec

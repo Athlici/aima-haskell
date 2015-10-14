@@ -190,7 +190,7 @@ ridgeRegress x y useConst lambda
                       (_,r) = qr x
                       rr = takeRows n r
                       ww = if useConst
-                            then diag $ join [0, constant 1 (n-1)]
+                            then diag $ vjoin [0, constant 1 (n-1)]
                             else ident n
                    in (trans rr <> rr + lambda `scale` ww) <\> trans x <> y
 

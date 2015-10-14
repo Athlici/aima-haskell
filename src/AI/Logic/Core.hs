@@ -12,7 +12,8 @@ module AI.Logic.Core (
     , LogicError(..)
     ) where
 
-import Control.Monad.Error
+import Control.Monad.Except
+import Control.Exception
 import Control.Monad.State
 import Data.Map (Map)
 
@@ -29,7 +30,8 @@ data LogicError    = ParseError
                    | UnknownCommand
                    | DefaultError deriving (Show)
 
-instance Error LogicError where noMsg = DefaultError
+--instance Error LogicError where noMsg = DefaultError
+instance Exception LogicError --might be incorrectly transcribed
 
 -----------------
 -- Expressions --
