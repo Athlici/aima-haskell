@@ -76,3 +76,5 @@ fromIndex :: Int -> Integer -> Permutation Int
 fromIndex n i = g $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
     f (j,s,l) k = (\(d,m) -> (m, S.deleteAt (fromIntegral d) s, (S.elemAt (fromIntegral d) s):l)) $ divMod j k
     g (_,_,x)   = fromPairs $ zip [n-1,n-2..0] x
+
+--main = print $ aStarSearch' puzzle8

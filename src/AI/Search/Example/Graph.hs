@@ -7,7 +7,7 @@ import Control.Monad.State (StateT)
 import Control.Monad
 import Data.IORef
 import Data.Map (Map, (!))
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, listToMaybe)
 import System.IO
 import System.IO.Unsafe
 
@@ -178,7 +178,7 @@ generateGraphProblems numProbs numNodes minLinks filepath = do
         go 0 = return []
         go n = do
             p  <- randomGraphProblem numNodes minLinks
-            case depthFirstGraphSearch p of
+            case listToMaybe $ depthFirstGraphSearch p of
                 Nothing -> go n
                 Just _  -> go (n-1) >>= \ps -> return (p:ps)
 
@@ -240,7 +240,7 @@ runDetailedCompare = detailedCompareSearchers allSearchers allSearcherNames
 --  structure. I'd like to add an iterative deepening graph search to this list,
 --  as well as some of the more exotic search algorithsm described in the
 --  textbook.
-allSearchers :: (Problem p s a, Ord s) => [p s a -> Maybe (Node s a)]
+allSearchers :: (Problem p s a, Ord s) => [p s a -> [Node s a]]
 allSearchers = [ breadthFirstGraphSearch, depthFirstGraphSearch
                , greedyBestFirstSearch, uniformCostSearch, aStarSearch']
 

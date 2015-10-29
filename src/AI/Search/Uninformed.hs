@@ -8,19 +8,19 @@ import AI.Util.Queue
 ----------------------------------
 
 -- |Search the deepest nodes in the search tree first.
-depthFirstTreeSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
+depthFirstTreeSearch :: (Problem p s a) => p s a -> [Node s a]
 depthFirstTreeSearch = treeSearch []
 
 -- |Search the shallowest nodes in the search tree first.
-breadthFirstTreeSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
+breadthFirstTreeSearch :: (Problem p s a) => p s a -> [Node s a]
 breadthFirstTreeSearch = treeSearch (newQueue :: FifoQueue (Node s a))
 
 -- |Search the deepest nodes in the graph first.
-depthFirstGraphSearch :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
+depthFirstGraphSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 depthFirstGraphSearch = graphSearch []
 
 -- |Search the shallowest nodes in the graph first.
-breadthFirstGraphSearch :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
+breadthFirstGraphSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 breadthFirstGraphSearch = graphSearch (newQueue :: FifoQueue (Node s a))
 
 -- |Return type for depth-limited search. We need this as there are two types of

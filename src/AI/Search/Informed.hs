@@ -19,7 +19,7 @@ type Heuristic s a = Node s a -> Double
 bestFirstTreeSearch :: (Problem p s a) =>
                        Heuristic s a    -- ^ Function to score each node
                     -> p s a            -- ^ Problem
-                    -> Maybe (Node s a)
+                    -> [Node s a]
 bestFirstTreeSearch f = treeSearch (newPriorityQueue f)
 
 -- |Best-first graph search keeps track of states that have already been visited
@@ -27,17 +27,17 @@ bestFirstTreeSearch f = treeSearch (newPriorityQueue f)
 bestFirstGraphSearch :: (Problem p s a, Ord s) =>
                         Heuristic s a   -- ^ Function to score each node
                      -> p s a           -- ^ Problem
-                     -> Maybe (Node s a)
+                     -> [Node s a]
 bestFirstGraphSearch f = graphSearch (newPriorityQueue f)
 
 -- |Minimum cost search preferentially explores nodes with the lowest cost
 --  accrued, to guarantee that it finds the best path to the solution.
-uniformCostSearch :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
+uniformCostSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 uniformCostSearch prob = bestFirstGraphSearch cost prob
 
 -- |Greedy best-first search preferentially explores nodes with the lowest
 --  cost remaining to the goal, ignoring cost already accrued.
-greedyBestFirstSearch :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
+greedyBestFirstSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 greedyBestFirstSearch prob = bestFirstGraphSearch (heuristic prob) prob
 
 -- |A* search takes a heuristic function that estimates how close each state is
@@ -47,12 +47,12 @@ greedyBestFirstSearch prob = bestFirstGraphSearch (heuristic prob) prob
 aStarSearch :: (Problem p s a, Ord s) =>
                Heuristic s a    -- ^ Heuristic function
             -> p s a            -- ^ Problem
-            -> Maybe (Node s a)
+            -> [Node s a]
 aStarSearch h = bestFirstGraphSearch (\n -> h n + cost n)
 
 -- |A variant on A* search that uses the heuristic function defined by the
 --  problem.
-aStarSearch' :: (Problem p s a, Ord s) => p s a -> Maybe (Node s a)
+aStarSearch' :: (Problem p s a, Ord s) => p s a -> [Node s a]
 aStarSearch' prob = aStarSearch (heuristic prob) prob
 
 --recursiveBestFirstSearch :: (Problem p s a) => p s a -> Maybe (Node s a)

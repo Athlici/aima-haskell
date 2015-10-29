@@ -131,11 +131,10 @@ expand p node = [ mkNode a s | (a,s) <- successor p (state node) ]
 treeSearch :: (Problem p s a, Queue q) =>
               q (Node s a)      -- ^ Empty queue
            -> p s a             -- ^ Problem
-           -> Maybe (Node s a)
-treeSearch q prob  = listToMaybe $ genericSearch f q prob 
+           -> [Node s a]
+treeSearch q prob  = genericSearch f q prob 
     where
         f node  closed = (expand prob node, closed)
-
 
 -- |Search through the successors of a node to find a goal. The argument
 --  @fringe@ should be an empty queue. If two paths reach the same state, use
@@ -143,8 +142,8 @@ treeSearch q prob  = listToMaybe $ genericSearch f q prob
 graphSearch :: (Problem p s a, Queue q, Ord s) =>
                q (Node s a)     -- ^ Empty queue
             -> p s a            -- ^ Problem
-            -> Maybe (Node s a)
-graphSearch q prob = listToMaybe $ genericSearch f q prob
+            -> [Node s a]
+graphSearch q prob = genericSearch f q prob
     where 
         f node closed 
             | state node `S.member` closed  = (newQueue,closed)
@@ -216,10 +215,10 @@ instance (Problem p s a, Eq s, Show s) => Problem (ProblemIO p) s a where
 -- |Given a problem and a search algorithm, run the searcher on the problem
 --  and return the solution found, together with statistics about how many
 --  nodes were expanded in the course of finding the solution.
-testSearcher :: p s a -> (ProblemIO p s a -> t) -> IO (t,Int,Int,Int)
+testSearcher :: p s a -> (ProblemIO p s a -> [Node s a]) -> IO (Maybe (Node s a),Int,Int,Int)
 testSearcher prob searcher = do
     p@(PIO _ numGoalChecks numSuccs numStates) <- mkProblemIO prob
-    let result = searcher p in result `seq` do
+    let result = (listToMaybe $ searcher p) in result `seq` do
         i <- readIORef numGoalChecks
         j <- readIORef numSuccs
         k <- readIORef numStates
@@ -245,17 +244,17 @@ testSearcher' prob searcher = do
 
 -- |Test multiple searchers on the same problem, and return a list of results
 --  and statistics.
-testSearchers :: [ProblemIO p s a -> t] -> p s a -> IO [(t,Int,Int,Int)]
+testSearchers :: [ProblemIO p s a -> [Node s a]] -> p s a -> IO [(Maybe (Node s a),Int,Int,Int)]
 testSearchers searchers prob = testSearcher prob `mapM` searchers
 
 -- |Given a list of problems and a list of searchers, run every algorithm on
 --  every problem and print out a table showing the performance of each.
-compareSearchers :: (Show t) =>
-                    [ProblemIO p s a -> t]  -- ^ List of search algorithms
-                 -> [p s a]                 -- ^ List of problems
-                 -> [String]                -- ^ Problem names
-                 -> [String]                -- ^ Search algorithm names
-                 -> IO [[(t,Int,Int,Int)]]  
+compareSearchers :: (Show a) =>
+                    [ProblemIO p s a -> [Node s a]] -- ^ List of search algorithms
+                 -> [p s a]                  -- ^ List of problems
+                 -> [String]                 -- ^ Problem names
+                 -> [String]                 -- ^ Search algorithm names
+                 -> IO [[(Maybe (Node s a),Int,Int,Int)]] 
 compareSearchers searchers probs header rownames = do
     results <- testSearchers searchers `mapM` probs
     printTable 20 (map (map f) (transpose results)) header rownames
@@ -264,14 +263,14 @@ compareSearchers searchers probs header rownames = do
         f (x,i,j,k) = SB (i,j,k)
 
 -- |Given a problem and a list of searchers, run each search algorithm over the
---  problem, and print out a table showing the performance of each searcher.
---  The columns of the table indicate: [Algorithm name, Depth of solution, 
---  Cost of solution, Number of goal checks, Number of node expansions,
---  Number of states expanded] .
+--  problem until they find the first solution or exhaust the space, and print out 
+--  a table showing the performance of each searcher. The columns of the table indicate: 
+--  [Algorithm name, Depth of solution, Cost of solution, Number of goal checks, 
+--  Number of node expansions, Number of states expanded] .
 detailedCompareSearchers ::
-        [ProblemIO p s a -> Maybe (Node s1 a1)] -- ^ List of searchers
-     -> [String]                                -- ^ Names of searchers
-     -> p s a                                   -- ^ Problem
+        [ProblemIO p s a -> [Node s a]]     -- ^ List of searchers
+     -> [String]                            -- ^ Names of searchers
+     -> p s a                               -- ^ Problem
      -> IO ()
 detailedCompareSearchers searchers names prob = do
     result <- testSearchers searchers prob
