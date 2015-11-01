@@ -3,6 +3,8 @@ module AI.Search.Uninformed where
 import AI.Search.Core
 import AI.Util.Queue
 
+import Data.List as L
+
 ----------------------------------
 -- Uninformed Search Algorithms --
 ----------------------------------
@@ -23,38 +25,42 @@ depthFirstGraphSearch = graphSearch []
 breadthFirstGraphSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 breadthFirstGraphSearch = graphSearch (newQueue :: FifoQueue (Node s a))
 
+-- |Depth-first search with a depth limit. Returns the usual lazy list of sulutions
+--  without any information whether the search failed or was cutoff.
+depthLimitedSearch :: (Problem p s a) => Int -> p s a -> [Node s a]
+depthLimitedSearch lim prob = recursiveDLS (root prob) where
+    recursiveDLS node
+      | goalTest prob (state node) = [node]
+      | depth node == lim          = []
+      | otherwise = concatMap recursiveDLS $ expand prob node
+
 -- |Return type for depth-limited search. We need this as there are two types of
 --  failure - either we establish that the problem has no solutions ('Fail') or
 --  we can't find any solutions within the depth limit ('Cutoff').
 data DepthLimited a = Fail | Cutoff | Ok a deriving (Show)
 
--- |Depth-first search with a depth limit. If the depth limit is reached we
---  return 'Cutoff', otherwise return 'Fail' (if no solution is found) or 'Ok'
---  (if a solution is found) which take the place of Nothing and Just in the
---  other search functions.
-depthLimitedSearch :: (Problem p s a) =>
-                      Int       -- ^ Depth limit
-                   -> p s a     -- ^ Problem
-                   -> DepthLimited (Node s a)
-depthLimitedSearch lim prob = recursiveDLS (root prob) prob lim
-    where
-        recursiveDLS node p lim
-            | goalTest p (state node) = Ok node
-            | depth node == lim       = Cutoff
-            | otherwise               = filt False $ map go (expand prob node)
-            where
-                go node = recursiveDLS node p lim
+instance Eq (DepthLimited a) where
+    (==) Fail   Fail   = True
+    (==) Cutoff Cutoff = True
+    (==) (Ok _) (Ok _) = True
+    (==) _ _ = False
 
-                filt cutoff [] = if cutoff then Cutoff else Fail
-                filt cutoff (Ok node : _)    = Ok node
-                filt cutoff (Fail    : rest) = filt cutoff rest
-                filt cutoff (Cutoff  : rest) = filt True   rest
+-- If the depth limit is reached we return 'Cutoff', otherwise return 'Fail' 
+-- (if no solution is found) or 'Ok' (if a solution is found).
+depthLimitedSearch' :: (Problem p s a) => Int -> p s a -> DepthLimited [Node s a] 
+depthLimitedSearch' lim prob = if L.null res then cf else Ok res where
+    (res,cf) = recursiveDLS (root prob) where
+        recursiveDLS node
+          | goalTest prob (state node) = ([node],Cutoff)
+          | depth node == lim          = ([],Cutoff)
+          | otherwise = comb $ map recursiveDLS $ expand prob node
+        comb x = (\y -> (y,if L.null y && (Cutoff `L.notElem` map snd x) then Fail else Cutoff)) $ concatMap fst x
 
 -- |Repeatedly try depth-limited search with an increasing depth limit.
-iterativeDeepeningSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
+iterativeDeepeningSearch :: (Problem p s a) => p s a -> [Node s a]
 iterativeDeepeningSearch prob = go 1
     where
-        go lim = case depthLimitedSearch lim prob of
+        go lim = case depthLimitedSearch' lim prob of
             Cutoff -> go (lim + 1)
-            Fail   -> Nothing
-            Ok n   -> Just n
+            Fail   -> []
+            Ok n   -> n
