@@ -1,9 +1,10 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleContexts, TypeSynonymInstances, FlexibleInstances, BangPatterns #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleContexts, TypeSynonymInstances, FlexibleInstances #-}
 
 module AI.Search.CSP where
 
 import Control.Monad.Reader
 import Control.Monad.State
+import Control.Monad (liftM)
 import Data.Map (Map, (!))
 import System.Random
 
@@ -119,7 +120,7 @@ hasConflicts  csp v a  = not . M.null . M.filterWithKey conflict
 -- |Return the number of conflicts that v == a has with other
 --  viables currently assigned.
 numConflicts :: CSP c v a => c v a -> v -> a -> Assignment v a -> Int
-numConflicts csp v a assignment = M.foldWithKey count 0 assignment
+numConflicts csp v a = M.foldWithKey count 0
     where
         ok = constraints csp v a
         count k v n  = if ok k v then n else n+1
@@ -144,8 +145,7 @@ backtrackingSearch :: CSP c var val =>
                       c var val     -- ^ Constraint Satisfaction Problem
                    -> Opts          -- ^ Search options
                    -> Maybe (Assignment var val)
-backtrackingSearch csp opts =
-    evalBacktracking (recursiveBacktracking csp) (domains csp) opts
+backtrackingSearch csp = evalBacktracking (recursiveBacktracking csp) (domains csp)
 
 -- |Recursive backtracking search. This is the main workhorse. We make use of
 --  the 'Backtracking' monad, which stores the current variable assignments,
@@ -350,19 +350,19 @@ fastOpts = Opts True True False True
 
 -- |Use Most Constrained Variable heuristic?
 useMcv :: MonadReader Opts m => m Bool
-useMcv = ask >>= return . mcv
+useMcv = liftM mcv ask
 
 -- |Use Least Constraining Variable heuristic?
 useLcv :: MonadReader Opts m => m Bool
-useLcv = ask >>= return . lcv
+useLcv = liftM lcv ask
 
 -- |Use Forwarc Checking?
 useFc  :: MonadReader Opts m => m Bool
-useFc = ask >>= return . fc
+useFc  = liftM fc  ask
 
 -- |Use Maintaining Arc Consistency?
 useMac :: MonadReader Opts m => m Bool
-useMac = ask >>= return . mac
+useMac = liftM mac ask
 
 -- |State variables for search in the 'Backtracking' monad.
 type BTState a b = (Domain a b, Map a [(a,b)], Assignment a b)
@@ -375,8 +375,7 @@ type Backtracking a b c = StateT (BTState a b) (Reader Opts) c
 -- |Use this to run a computation in the 'Backtracking' monad to extract
 --  the final state and value.
 runBacktracking :: Ord a => Backtracking a b c -> Domain a b -> Opts -> (c, BTState a b)
-runBacktracking computation dom opts = 
-    runReader (runStateT computation (dom, prune, assgn)) opts
+runBacktracking computation dom = runReader $ runStateT computation (dom,prune,assgn)
     where
         prune = mkUniversalMap (M.keys dom) []
         assgn = M.empty
@@ -392,7 +391,7 @@ execBacktracking c dom opts = snd $ runBacktracking c dom opts
 
 -- |Return the current (constrained) domains in backtracking search.
 getDomain :: MonadState (a,b,c) m => m a
-getDomain = get >>= return . fst3
+getDomain = liftM fst3 get
 
 -- |Modify the current constrained domains in backtracking search.
 modifyDomain :: MonadState (a,b,c) m => (a -> a) -> m ()
@@ -400,7 +399,7 @@ modifyDomain f = modify $ \(x,y,z) -> (f x,y,z)
 
 -- |Return the list of pruned variables in backtracking search.
 getPruned :: MonadState (a,b,c) m => m b
-getPruned = get >>= return . snd3
+getPruned = liftM snd3 get
 
 -- |Store a new set of pruned values
 putPruned :: MonadState (a,b,c) m => b -> m ()
@@ -412,7 +411,7 @@ modifyPruned f = modify $ \(x,y,z) -> (x,f y,z)
 
 -- |Return the current assignment list in backtracking search.
 getAssignment :: MonadState (a,b,c) m => m c
-getAssignment = get >>= return . thd3
+getAssignment = liftM thd3 get
 
 -- |Store a new assignment in place of the old one.
 putAssignment :: MonadState (a,b,c) m => c -> m ()

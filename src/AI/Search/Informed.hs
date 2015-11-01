@@ -33,7 +33,7 @@ bestFirstGraphSearch f = graphSearch (newPriorityQueue f)
 -- |Minimum cost search preferentially explores nodes with the lowest cost
 --  accrued, to guarantee that it finds the best path to the solution.
 uniformCostSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
-uniformCostSearch prob = bestFirstGraphSearch cost prob
+uniformCostSearch = bestFirstGraphSearch cost
 
 -- |Greedy best-first search preferentially explores nodes with the lowest
 --  cost remaining to the goal, ignoring cost already accrued.
@@ -54,6 +54,9 @@ aStarSearch h = bestFirstGraphSearch (\n -> h n + cost n)
 --  problem.
 aStarSearch' :: (Problem p s a, Ord s) => p s a -> [Node s a]
 aStarSearch' prob = aStarSearch (heuristic prob) prob
+
+--iterativeDeepeningAStar :: (Problem p s a, Ord s) => p s a -> [Node s a]
+--iterativeDeepeningAStar = 
 
 --recursiveBestFirstSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
 --recursiveBestFirstSearch prob = eithertoMaybe $ RBFS prob (root prob) infinity where

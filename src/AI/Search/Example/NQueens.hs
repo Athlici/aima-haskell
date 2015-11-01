@@ -3,9 +3,11 @@
 module AI.Search.Example.NQueens where
 
 import qualified Data.List as L
+import Data.Maybe (isJust)
 
 import AI.Search.Core
 import AI.Util.Util
+import AI.Search.Uninformed
 
 ----------------------
 -- N Queens Problem --
@@ -17,7 +19,7 @@ data NQueens s a = NQ { sizeNQ :: Int } deriving (Show)
 
 -- |Update the state of the N-Queens board by playing a queen at (i,n).
 updateNQ :: (Int,Int) -> [Maybe Int] -> [Maybe Int]
-updateNQ (c,r) s = insert c (Just r) s
+updateNQ (c,r) = insert c (Just r)
 
 -- |Would putting two queens in (r1,c1) and (r2,c2) conflict?
 conflict :: Int -> Int -> Int -> Int -> Bool
@@ -43,13 +45,12 @@ instance Problem NQueens [Maybe Int] (Int,Int) where
             where
                 actions = map ((,) i) [0..n-1]
 
-    goalTest (NQ n) s = if last s == Nothing
-        then False
-        else not . or $ map f (enumerate s)
-            where
-                f (c,Nothing) = False
-                f (c,Just r)  = conflicted s r c
+    goalTest (NQ n) s = isJust (last s) && all (not . f) (enumerate s) where
+        f (c,Nothing) = False
+        f (c,Just r)  = conflicted s r c
 
 -- |An example N-Queens problem on an 8x8 grid.
 nQueens :: NQueens [Maybe Int] (Int,Int)
 nQueens = NQ 8
+
+-- main = print $ depthLimitedSearch 8 nQueens

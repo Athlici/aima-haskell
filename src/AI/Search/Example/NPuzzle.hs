@@ -32,7 +32,7 @@ instance Problem NPuzzle NPState NPMove where
 
     successor (NP n _) (NPS b m) = [(x,NPS (move x) (x:m)) | x <- [Ri .. Up], valid x] where
         blnkpos = 0 .^ b
-        valid m = inbound n blnkpos m
+        valid   = inbound n blnkpos
         move  m = b * p [[blnkpos,newpos m]] where
             newpos Ri = blnkpos+1
             newpos Do = blnkpos+n
@@ -69,12 +69,12 @@ factorials :: Int -> [Integer]
 factorials n = reverse $ scanl (*) 1 [1..(fromIntegral n)]
 
 toIndex :: Int -> Permutation Int -> Integer
-toIndex n p = fst $ foldl f (0, S.empty) $ zip (map (.^ p) [0..n-1]) (factorials (n-1)) where
+toIndex n p = fst $ foldl f (0,S.empty) $ zip (map (.^ p) [0..n-1]) (factorials (n-1)) where
     f (i,s) (j,k) = (\sn -> (i + k * fromIntegral (j - S.findIndex j sn), sn)) $ S.insert j s
 
 fromIndex :: Int -> Integer -> Permutation Int
 fromIndex n i = g $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
-    f (j,s,l) k = (\(d,m) -> (m, S.deleteAt (fromIntegral d) s, (S.elemAt (fromIntegral d) s):l)) $ divMod j k
+    f (j,s,l) k = (\(d,m) -> (m,fromIntegral d `S.deleteAt` s,(fromIntegral d `S.elemAt` s):l)) $ divMod j k
     g (_,_,x)   = fromPairs $ zip [n-1,n-2..0] x
 
 --main = print $ aStarSearch' puzzle8

@@ -5,7 +5,7 @@ import qualified Data.List as L
 
 data Qwirkle h o = QG {hand :: [Stone], order :: [Player]} deriving (Show)
 
-data QMove = [(Int,Int,Stone)]
+type QMove = [(Int,Int,Stone)]
 
 data Color = Yellow | Orange | Red  | Green   | Blue     | Purple  deriving (Read,Show,Eq,Enum,Ord)
 data Shape = Circle | Square | Star | Diamond | Octagram | Flower  deriving (Read,Show,Eq,Enum,Ord)
@@ -47,4 +47,4 @@ instance Game Qwirkle QState QMove where
 
     utility = undefined --my score minus maximum of opponents
 
-    terminalTest _ s = or (map (all (\x -> (snd x)==0)) (ophan s)) || null.hand s   --any hand empty
+    terminalTest _ s = any (all (\(_,x) -> x == 0)) (ophan s) || null.hand s   --any hand empty

@@ -40,7 +40,7 @@ instance Game Connect4 C4State C4Move where
     makeMove     (C g) col s  = let row = lowestUnoccupied (col-1) s
                                 in makeMove g (col-1, row) s
 
-    sortMoves (C (TTT h _ _)) as = L.sortBy (comparing f) as
+    sortMoves (C (TTT h _ _)) = L.sortBy (comparing f)
         where f x = abs (x - (h+1) `div` 2)
 
     legalMoves (C g) s@(TTS board _ _ _) =
@@ -53,7 +53,7 @@ lowestUnoccupied :: Int -> TTState -> Int
 lowestUnoccupied col (TTS board _ _ (_,v,_)) = 
     let coords   = map (\row -> (col,row)) [0..v-1]
         counters = map (`M.lookup` board) coords
-    in countIf (/=Nothing) counters
+    in countIf (/=Nothing) counters --isJust?
 
 -- |Play a game of Connect 4 against an opponent using alpha/beta search.
 demo :: IO ()

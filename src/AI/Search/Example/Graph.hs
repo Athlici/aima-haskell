@@ -7,7 +7,7 @@ import Control.Monad.State (StateT)
 import Control.Monad
 import Data.IORef
 import Data.Map (Map, (!))
-import Data.Maybe (fromJust, listToMaybe)
+import Data.Maybe (fromJust, fromMaybe, listToMaybe)
 import System.IO
 import System.IO.Unsafe
 
@@ -53,9 +53,8 @@ getNeighbours a (G g _) = G.getNeighbours a g
 
 -- |Get the location of a node from a GraphMap.
 getLocation :: Ord a => a -> GraphMap a -> Location
-getLocation a (G _ l) = case M.lookup a l of
-    Nothing -> error "Vertex not found in graph -- GETLOCATION"
-    Just pt -> pt
+getLocation a (G _ l) = fromMaybe (error msg) (M.lookup a l) where
+    msg = "Vertex not found in graph -- GETLOCATION"
 
 -- | Add an edge between two nodes to a GraphMap.
 addEdge :: Ord a => a -> a -> Cost -> GraphMap a -> GraphMap a
@@ -64,9 +63,7 @@ addEdge x y cost (G graph locs) = G (G.addUndirectedEdge x y cost graph) locs
 -- |The cost associated with moving between two nodes in a GraphMap. If the
 --  nodes are not connected by an edge, then the cost is returned as infinity.
 costFromTo :: Ord a => GraphMap a -> a -> a -> Cost
-costFromTo graph a b = case lookup b (getNeighbours a graph) of
-    Nothing -> 1/0
-    Just c  -> c
+costFromTo graph a b = fromMaybe (1/0) $ lookup b $ getNeighbours a graph
 
 -- |Data structure to hold a graph problem (represented as a GraphMap together
 --  with an initial and final node).

@@ -26,6 +26,7 @@ Completed:
 - Iterative Deepening Search (Fig 3.18)
 - Greedy Best First Search
 - A* Search
+- Eight Puzzle
 
 To do:
 
@@ -34,7 +35,6 @@ To do:
 - Memory-Bounded A* (MA*)
 - Simplified MA*
 - Bidirectional Search
-- Eight Puzzle
 
 ### 4. Beyond Classical Search
 
