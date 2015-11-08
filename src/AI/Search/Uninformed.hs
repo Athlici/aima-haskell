@@ -51,16 +51,15 @@ depthLimitedSearch' :: (Problem p s a) => Int -> p s a -> DepthLimited [Node s a
 depthLimitedSearch' lim prob = if L.null res then cf else Ok res where
     (res,cf) = recursiveDLS (root prob) where
         recursiveDLS node
-          | goalTest prob (state node) = ([node],Cutoff)
-          | depth node == lim          = ([],Cutoff)
+          | goalTest prob (state node) = ([node],Cutoff)      --Because the stepcost is 1 testing before
+          | depth node == lim          = ([],Cutoff)          --checking the depth makes sense here
           | otherwise = comb $ map recursiveDLS $ expand prob node
         comb x = (\y -> (y,if L.null y && (Cutoff `L.notElem` map snd x) then Fail else Cutoff)) $ concatMap fst x
 
 -- |Repeatedly try depth-limited search with an increasing depth limit.
 iterativeDeepeningSearch :: (Problem p s a) => p s a -> [Node s a]
-iterativeDeepeningSearch prob = go 1
-    where
-        go lim = case depthLimitedSearch' lim prob of
-            Cutoff -> go (lim + 1)
-            Fail   -> []
-            Ok n   -> n
+iterativeDeepeningSearch prob = go 0 where
+    go lim = case depthLimitedSearch' lim prob of
+        Cutoff -> go (lim + 1)
+        Fail   -> []
+        Ok n   -> n

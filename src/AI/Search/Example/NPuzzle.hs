@@ -77,4 +77,4 @@ fromIndex n i = g $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
     f (j,s,l) k = (\(d,m) -> (m,fromIntegral d `S.deleteAt` s,(fromIntegral d `S.elemAt` s):l)) $ divMod j k
     g (_,_,x)   = fromPairs $ zip [n-1,n-2..0] x
 
---main = print $ aStarSearch' puzzle8
+--main = print $ iterativeDeepeningAStar puzzle8

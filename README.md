@@ -26,12 +26,12 @@ Completed:
 - Iterative Deepening Search (Fig 3.18)
 - Greedy Best First Search
 - A* Search
+- Iterative-Deepening A*
 - Eight Puzzle
 
 To do:
 
 - Recursive Best First Search (Fig 3.26)
-- Iterative-Deepening A*
 - Memory-Bounded A* (MA*)
 - Simplified MA*
 - Bidirectional Search

@@ -3,7 +3,12 @@ module AI.Search.Informed where
 import AI.Search.Core
 import AI.Util.Queue
 
-infinity = 1/0
+import Data.List as L
+
+inf = 1/0
+
+--TODO: Rewrite the benchmark code to use different problems and have the search
+--functions use the problem heuristic by default
 
 ---------------------------------
 -- Informed (Heuristic) Search --
@@ -55,14 +60,25 @@ aStarSearch h = bestFirstGraphSearch (\n -> h n + cost n)
 aStarSearch' :: (Problem p s a, Ord s) => p s a -> [Node s a]
 aStarSearch' prob = aStarSearch (heuristic prob) prob
 
---iterativeDeepeningAStar :: (Problem p s a, Ord s) => p s a -> [Node s a]
---iterativeDeepeningAStar = 
+iterativeDeepeningAStar :: (Problem p s a, Ord s) => p s a -> [Node s a]
+iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
+    go (res, lim)
+      | lim == inf = []
+      | L.null res = go $ ida (root prob)
+      | otherwise  = res
+        where
+            ida node
+              | (cost node + heuristic prob node) > lim = ([],cost node + heuristic prob node)
+              | goalTest prob (state node) = ([node],cost node)
+              | otherwise = comb $ map ida $ expand prob node
+            comb x = (concatMap fst x,minimum $ (inf:) $ map snd x)
+
 
 --recursiveBestFirstSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
---recursiveBestFirstSearch prob = eithertoMaybe $ RBFS prob (root prob) infinity where
+--recursiveBestFirstSearch prob = eithertoMaybe $ RBFS prob (root prob) inf where
 --    eithertoMaybe (Left  n) = Just n
 --    eithertoMaybe (Right _) = Nothing
 --    RBFS prob n f
 --        | goalTest prob n = Left n
---        | null (expand prob n) = Right infinity
+--        | null (expand prob n) = Right inf
 --        | otherwise = 
