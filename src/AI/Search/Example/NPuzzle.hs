@@ -1,13 +1,18 @@
 {-# LANGUAGE MultiParamTypeClasses #-} --{-# LANGUAGE FlexibleInstances #-}
 
-module AI.Search.Example.NPuzzle where
+--module AI.Search.Example.NPuzzle where
 
 --ToDo:Fix imports
 import AI.Search.Core
 import AI.Search.Informed
+import AI.Search.Uninformed
 
 import qualified Data.Set as S
+import qualified Data.List as L
 import Math.Algebra.Group.PermutationGroup
+
+import System.IO
+
 ----------------------
 -- N Puzzle Problem --
 ----------------------
@@ -18,7 +23,13 @@ data NPuzzle s a = NP { sizeNP :: Int , initialNP :: [Int]} deriving (Show)
 
 data NPMove = Ri | Do | Le | Up deriving (Show,Eq,Enum,Ord)
 
-data NPState = NPS { boardNP :: Permutation Int , movesNP :: [NPMove] } deriving (Show,Eq,Ord)
+data NPState = NPS { boardNP :: Permutation Int , movesNP :: [NPMove] } deriving (Show)
+
+instance Eq NPState where
+  (NPS a _) == (NPS b _) = a == b
+
+instance Ord NPState where
+  (NPS a _) `compare` (NPS b _) = a `compare` b
 
 inbound :: Int -> Int -> NPMove -> Bool
 inbound n m Ri = (m `mod` n) /= n-1
@@ -61,7 +72,10 @@ puzzle8 = NP 3 [7,2,4,5,0,6,8,3,1]
 --puzzle8 = NP 3 [1,2,0,3,4,5,6,7,8]
 --puzzle8 = NP 3 [0,4,2,1,3,5,6,7,8]
 
---main = print . show $ aStarSearch' puzzle8
+--main = print . show $ aStarSearch puzzle8
+main = do
+    hSetBuffering stdout NoBuffering
+    print $ stateSpaceExploration (NP 4 [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] :: NPuzzle NPState NPMove)
 
 --very ugly code to map a permutation to it's lexicographic index 
 --factorials from n to 0 as a list.
@@ -77,4 +91,3 @@ fromIndex n i = g $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
     f (j,s,l) k = (\(d,m) -> (m,fromIntegral d `S.deleteAt` s,(fromIntegral d `S.elemAt` s):l)) $ divMod j k
     g (_,_,x)   = fromPairs $ zip [n-1,n-2..0] x
 
---main = print $ iterativeDeepeningAStar puzzle8

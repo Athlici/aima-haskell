@@ -239,7 +239,7 @@ runDetailedCompare = detailedCompareSearchers allSearchers allSearcherNames
 --  textbook.
 allSearchers :: (Problem p s a, Ord s) => [p s a -> [Node s a]]
 allSearchers = [ breadthFirstGraphSearch, depthFirstGraphSearch
-               , greedyBestFirstSearch, uniformCostSearch, aStarSearch']
+               , greedyBestFirstSearch, uniformCostSearch, aStarSearch]
 
 -- |Names for the search algorithms in this module.
 allSearcherNames :: [String]

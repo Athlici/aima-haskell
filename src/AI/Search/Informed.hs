@@ -5,7 +5,7 @@ import AI.Util.Queue
 
 import Data.List as L
 
-inf = 1/0
+inf = 1/0        --this is stupid but gives the biggest double
 
 --TODO: Rewrite the benchmark code to use different problems and have the search
 --functions use the problem heuristic by default
@@ -45,20 +45,16 @@ uniformCostSearch = bestFirstGraphSearch cost
 greedyBestFirstSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 greedyBestFirstSearch prob = bestFirstGraphSearch (heuristic prob) prob
 
--- |A* search takes a heuristic function that estimates how close each state is
+-- |A* search uses a heuristic function that estimates how close each state is
 --  to the goal. It combines this with the path cost so far to get a total
 --  score, and preferentially explores nodes with a lower score. It is optimal
---  whenever the heuristic function is 
-aStarSearch :: (Problem p s a, Ord s) =>
-               Heuristic s a    -- ^ Heuristic function
-            -> p s a            -- ^ Problem
-            -> [Node s a]
-aStarSearch h = bestFirstGraphSearch (\n -> h n + cost n)
+--  whenever the heuristic function is admissible. 
+aStarSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
+aStarSearch prob = bestFirstGraphSearch (\n -> heuristic prob n + cost n) prob
 
--- |A variant on A* search that uses the heuristic function defined by the
---  problem.
-aStarSearch' :: (Problem p s a, Ord s) => p s a -> [Node s a]
-aStarSearch' prob = aStarSearch (heuristic prob) prob
+-- |A variant on A* search that has the heuristic function as first argument
+aStarSearch' :: (Problem p s a, Ord s) => Heuristic s a -> p s a -> [Node s a]
+aStarSearch' h = bestFirstGraphSearch (\n -> h n + cost n)
 
 iterativeDeepeningAStar :: (Problem p s a, Ord s) => p s a -> [Node s a]
 iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
@@ -74,11 +70,14 @@ iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
             comb x = (concatMap fst x,minimum $ (inf:) $ map snd x)
 
 
---recursiveBestFirstSearch :: (Problem p s a) => p s a -> Maybe (Node s a)
---recursiveBestFirstSearch prob = eithertoMaybe $ RBFS prob (root prob) inf where
---    eithertoMaybe (Left  n) = Just n
---    eithertoMaybe (Right _) = Nothing
---    RBFS prob n f
---        | goalTest prob n = Left n
---        | null (expand prob n) = Right inf
+--this will require some thought and clever formulation as mutable nodes seem
+--like an ugly solution
+--recursiveBestFirstSearch :: (Problem p s a) => p s a -> [Node s a]
+--recursiveBestFirstSearch prob = either (id) (const []) $ RBFS (root prob) inf where
+--    RBFS n f
+--        | goalTest prob n = Left [n]
+--        | L.null succ = Right inf
+--        | L.null (tail succ) = RBFS (head succ) f
 --        | otherwise = 
+--        where 
+--            succ = expand prob n

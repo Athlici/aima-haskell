@@ -77,10 +77,10 @@ class Eq s => Problem p s a where
     valueP :: p s a -> s -> Double
     valueP _ = const 0
 
--- |Extending the Problem Class for bidirectional Problems
-class Problem p s a => BidirProblem p s a where
-    -- | Inverse function for successor, returns the generating nodes.
-    precessor :: p s a -> s -> [(a,s)]
+---- |Extending the Problem Class for bidirectional Problems
+--class Problem p s a => BidirProblem p s a where
+--    -- | Inverse function for successor, returns the generating nodes.
+--    precessor :: p s a -> s -> [(a,s)]
 
     -- goalTest?
 
@@ -100,6 +100,16 @@ instance (Show s, Show a) => Show (Node s a) where
     show (Node state _ action cost depth _) =
         "Node(state=" ++ show state ++ ",action=" ++ show action ++ 
             ",cost=" ++ show cost ++ ",depth=" ++ show depth ++ ")"
+
+-- Ignores actions; primarily because it's messy and also because two actions which
+-- lead from the same parent to the same node are redundant anyway
+instance Eq s => Eq (Node s a) where
+--    (Node as ap _ ac ad av) == (Node bs bp _ bc bd bv) = (as,ap,ac,ad,av) == (bs,bp,bc,bd,bv)
+    (Node a _ _ _ _ _) == (Node b _ _ _ _ _) = a == b
+
+instance Ord s => Ord (Node s a) where
+--    (Node as ap _ ac ad av) `compare` (Node bs bp _ bc bd bv) = (as,ap,ac,ad,av) `compare` (bs,bp,bc,bd,bv)
+    (Node a _ _ _ _ _) `compare` (Node b _ _ _ _ _) = a `compare` b
 
 -- |A convenience constructor for root nodes (a node with no parent, no action
 --  that leads to it, and zero cost.)
@@ -134,7 +144,7 @@ treeSearch :: (Problem p s a, Queue q) =>
            -> [Node s a]
 treeSearch q prob  = genericSearch f q prob 
     where
-        f node  closed = (expand prob node, closed)
+        f node closed = (expand prob node,closed)
 
 -- |Search through the successors of a node to find a goal. The argument
 --  @fringe@ should be an empty queue. If two paths reach the same state, use
@@ -155,9 +165,9 @@ graphSearch q prob = genericSearch f q prob
 genericSearch :: (Queue q, Problem p s a) =>
                        (Node s a -> S.Set a1 -> ([Node s a], S.Set a1))
                        -> q (Node s a) -> p s a -> [Node s a]
-genericSearch f q prob = findFinalState  (genericSearchPath f (root prob `push` q))
+genericSearch f q prob = findFinalState (genericSearchPath f (root prob `push` q))
     where 
-        findFinalState = filter  (goalTest prob.state) 
+        findFinalState = filter (goalTest prob.state) 
 
 -- Return a (potentially infinite) list of nodes to search.
 -- Since the result is lazy, you can break out early if you find a result. 
