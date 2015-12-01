@@ -38,6 +38,7 @@ Library
                         MonadRandom,
                         array,
                         gnuplot,
+                        permutation,
                         hmatrix     == 0.16.1.5,
                         hmatrix-gsl == 0.16.0.3,
                         QuickCheck
