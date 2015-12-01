@@ -8,6 +8,7 @@ import AI.Search.Informed
 import AI.Search.Uninformed
 
 import Data.Function (on)
+import Data.Vector hiding (sum,map,unsafeFreeze,unsafeThaw)
 
 import qualified Data.Set as S
 import qualified Data.List as L
@@ -46,6 +47,18 @@ inbound n m Do = m < n*(n-1)
 inbound n m Le = (m `mod` n) /= 0
 inbound n m Up = m >= n
 
+manhattendist :: Int -> Vector Int
+manhattendist n = generate (n*n*n*n) mhd where
+      mhd i = on (+) abs (ax-bx) (ay-by) where
+          ax = a `mod` n
+          bx = b `mod` n
+          ay = a `div` n
+          by = b `div` n
+          a  = i `mod` (n*n)
+          b  = i `div` (n*n)
+
+mhd3 = manhattendist 3
+
 -- |N-Puzzle is an instance of Problem. 
 instance Problem NPuzzle NPState NPMove where
     initial (NP n i) = NPS (inverse $ listPermute (n*n) i) []    --fromList creates a permutation sorting i, might need the inverse
@@ -66,13 +79,8 @@ instance Problem NPuzzle NPState NPMove where
     goalTest (NP n _) (NPS b _) = b == permute (n*n)
 
     heuristic (NP n _) (Node (NPS b m) _ _ _ _ _) = 
-        fromIntegral . sum $ map manhattendist [1..n*n-1] where
-            manhattendist i = abs (x i - xs i) + abs (y i - ys i) where
-                x i = i `mod` n
-                y i = i `div` n
-                xs i = pos i `mod` n
-                ys i = pos i `div` n
-                pos i = b `at` i
+        fromIntegral . sum $ map mhd [1..n*n-1] where
+            mhd x = mhd3 ! (x*n*n+(b `at` x))
 
 --subproblems8 :: (Problem p s a) => p s a -> [s -> s]
 --subproblems8 _ = [id]

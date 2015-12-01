@@ -1,3 +1,5 @@
+{-#LANGUAGE BangPatterns #-}
+
 module AI.Search.Informed where
 
 import AI.Search.Core
@@ -56,7 +58,7 @@ aStarSearch prob = bestFirstGraphSearch (\n -> heuristic prob n + cost n) prob
 aStarSearch' :: (Problem p s a, Ord s) => Heuristic s a -> p s a -> [Node s a]
 aStarSearch' h = bestFirstGraphSearch (\n -> h n + cost n)
 
-iterativeDeepeningAStar :: (Problem p s a, Ord s) => p s a -> [Node s a]
+iterativeDeepeningAStar :: Problem p s a => p s a -> [Node s a]
 iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
     go (res, lim)
       | lim == inf = []
@@ -66,8 +68,10 @@ iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
             ida node
               | (cost node + heuristic prob node) > lim = ([],cost node + heuristic prob node)
               | goalTest prob (state node) = ([node],cost node)
-              | otherwise = comb $ map ida $ expand prob node
-            comb x = (concatMap fst x,minimum $ (inf:) $ map snd x)
+              | otherwise = foldl' comb ([],inf) $ expand prob node
+            comb (r,l) x = (\(!xr,!xl) -> (r++xr,min l xl)) $ ida x
+--              | otherwise = comb $ map ida $ expand prob node
+--            comb !x = (concatMap fst x,minimum $ (inf:) $ map snd x)
 
 
 --this will require some thought and clever formulation as mutable nodes seem
