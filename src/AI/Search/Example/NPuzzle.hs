@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-} --{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, BangPatterns #-} --{-# LANGUAGE FlexibleInstances #-}
 
 --module AI.Search.Example.NPuzzle where
 
@@ -8,15 +8,13 @@ import AI.Search.Informed
 import AI.Search.Uninformed
 
 import Data.Function (on)
-import Data.Vector hiding (sum,map,unsafeFreeze,unsafeThaw)
+import Data.Vector (Vector,generate,(!))
+import Control.Monad.ST (runST,ST)
 
 import qualified Data.Set as S
 import qualified Data.List as L
-import Control.Monad
-import Control.Monad.ST
 import Data.Permute
 import Data.Permute.ST
---import Math.Algebra.Group.PermutationGroup
 
 import System.IO
 
@@ -100,15 +98,46 @@ main = print . show $ iterativeDeepeningAStar puzzle8
 
 --very ugly code to map a permutation to it's lexicographic index 
 --factorials from n to 0 as a list.
---factorials :: Int -> [Integer]
---factorials n = reverse $ scanl (*) 1 [1..(fromIntegral n)]
+factorials :: Int -> [Integer]
+factorials n = reverse $ scanl (*) 1 [1..(fromIntegral n)]
 
---toIndex :: Int -> Permutation Int -> Integer
---toIndex n p = fst $ foldl f (0,S.empty) $ zip (map (.^ p) [0..n-1]) (factorials (n-1)) where
---    f (i,s) (j,k) = (\sn -> (i + k * fromIntegral (j - S.findIndex j sn), sn)) $ S.insert j s
+toIndex :: Int -> Permute -> Integer
+toIndex n p = fst $ foldl f (0,S.empty) $ zip (elems p) (factorials (n-1)) where
+    f (i,s) (j,k)  = newpair $ S.insert j s where
+        newpair sn = (i + k * fromIntegral (j - S.findIndex j sn),sn)
 
---fromIndex :: Int -> Integer -> Permutation Int
---fromIndex n i = g $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
---    f (j,s,l) k = (\(d,m) -> (m,fromIntegral d `S.deleteAt` s,(fromIntegral d `S.elemAt` s):l)) $ divMod j k
---    g (_,_,x)   = fromPairs $ zip [n-1,n-2..0] x
+fromIndex :: Int -> Integer -> Permute
+fromIndex n i = res $ foldl f (i,S.fromList [0..n-1],[]) (factorials (n-1)) where
+    res (_,_,x) = listPermute n $ reverse x
+    f (j,s,l) k = newtriple $ divMod j k where
+        newtriple (d,m) = (m,fromIntegral d `S.deleteAt` s,(fromIntegral d `S.elemAt` s):l)
 
+toIndex' :: Int -> Permute -> Integer
+toIndex' n p = rank' (toInteger n) np (inverse np) where
+    rank' :: Integer -> Permute -> Permute -> Integer
+    rank' 1 _ _  = 0
+    rank' n p pi = res s n (rank' (n-1) p' pi') where
+        res !a !b c = toInteger a + toInteger b * c --this is the most ugly fix!
+        p' = runST $ unsafeThaw p  >>= \x -> unsafeSwapElems x n1 (pi `at` n1) >> unsafeFreeze x
+        pi'= runST $ unsafeThaw pi >>= \x -> unsafeSwapElems x n1 s >> unsafeFreeze x
+        s  = p `at` n1
+        n1 = fromInteger n-1
+    np = runST $ unsafeFreeze =<< newCopyPermute =<< unsafeThaw p
+        --manip f x = runST $ unsafeThaw x >>= \y -> f y >> unsafeFreeze y
+
+fromIndex' :: Int -> Integer -> Permute
+fromIndex' n i = runST $ do
+    p <- newPermute n
+    unrank p (toInteger n) i 
+    unsafeFreeze p where
+        unrank :: MPermute p m => p -> Integer -> Integer -> m p
+        unrank p 0 _ = return p
+        unrank p n r = do
+            unsafeSwapElems p (fromInteger n-1) $ fromInteger (r `mod` n)
+            unrank p (n-1) (r `div` n)
+
+--instance Enum Permute where
+--    toEnum 
+--    fromEnum
+--    succ 
+--    pred
