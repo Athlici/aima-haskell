@@ -18,6 +18,8 @@ import Data.Permute.ST
 
 import System.IO
 
+import System.Random
+
 ----------------------
 -- N Puzzle Problem --
 ----------------------
@@ -91,7 +93,7 @@ puzzle8 = NP 3 [7,2,4,5,0,6,8,3,1]
 --puzzle8 = NP 3 [1,2,0,3,4,5,6,7,8]
 --puzzle8 = NP 3 [0,4,2,1,3,5,6,7,8]
 
-main = print . show $ iterativeDeepeningAStar puzzle8
+main = print . show $ recursiveBestFirstSearch puzzle8
 --main = do
 --    hSetBuffering stdout NoBuffering
 --    print $ stateSpaceExploration (NP 4 [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] :: NPuzzle NPState NPMove)
@@ -135,6 +137,14 @@ fromIndex' n i = runST $ do
         unrank p n r = do
             unsafeSwapElems p (fromInteger n-1) $ fromInteger (r `mod` n)
             unrank p (n-1) (r `div` n)
+
+--fac :: Integer -> Integer
+--fac n = product [1..n]
+
+--main = do
+--    g <- newStdGen
+--    l <- return $ take 10 $ randomRs (0,(fac 10000)-1) g
+--    print $ l == (map ((toIndex' 10000).(fromIndex' 10000)) l)
 
 --instance Enum Permute where
 --    toEnum 

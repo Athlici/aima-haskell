@@ -74,14 +74,21 @@ iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
 --            comb !x = (concatMap fst x,minimum $ (inf:) $ map snd x)
 
 
---this will require some thought and clever formulation as mutable nodes seem
---like an ugly solution
---recursiveBestFirstSearch :: (Problem p s a) => p s a -> [Node s a]
---recursiveBestFirstSearch prob = either (id) (const []) $ RBFS (root prob) inf where
---    RBFS n f
---        | goalTest prob n = Left [n]
---        | L.null succ = Right inf
---        | L.null (tail succ) = RBFS (head succ) f
---        | otherwise = 
---        where 
---            succ = expand prob n
+recursiveBestFirstSearch :: (Problem p s a) => p s a -> [Node s a]
+recursiveBestFirstSearch prob = either (:[]) (const []) $ rbfs (root prob) 0 inf where
+    rbfs !n !f !lim
+      | f > lim = Right f
+      | goalTest prob (state n) = Left n
+      | L.null succ = Right inf
+      | L.null (tail succ) = rbfs (head succ) f lim
+      | otherwise = searchWhile $ pop (extend (map initvalues succ) (newPriorityQueue fst))
+        where 
+            succ = expand prob n
+--            initvalues = let f = heuristic prob in if (f n)<F then (\x -> (max F (f x),x)) else (\x -> (f x,x))
+            initvalues x = let h = heuristic prob in if h n<f then (max f (h x),x) else (h x,x)     --try later whether this gets optimised
+            searchWhile ((!fn1,!n1),!r)
+              | fn1 > lim || fn1 == inf = Right fn1
+              | otherwise = either Left nextq (rbfs n1 fn1 bnd)
+                where
+                    nextq x = searchWhile $ pop $ push (x,n1) r
+                    bnd = min lim (fst $ fst $ pop r)

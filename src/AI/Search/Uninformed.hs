@@ -16,7 +16,7 @@ stateSpaceExploration :: (Ord s,Problem p s a) => p s a -> [Int]
 stateSpaceExploration prob = takeWhile (>0) (lengthlist S.empty $ S.singleton $ root prob) where 
     lengthlist p c = S.size c : lengthlist c (S.foldl' addnewelems S.empty c) where
         addnewelems s e = L.foldl' (flip S.insert) s $ L.filter unvisited $ expand prob e
-        unvisited x = ((&&) `on` S.notMember x) p c
+        unvisited x = on (&&) (S.notMember x) p c
 
 -- |Search the deepest nodes in the search tree first.
 depthFirstTreeSearch :: (Problem p s a) => p s a -> [Node s a]
