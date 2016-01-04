@@ -68,14 +68,14 @@ iterativeDeepeningAStar prob = go ([],heuristic prob (root prob)) where
         where
             ida node
               | f node > lim = ([],f node)
---              | otherwise = foldl' comb (s node,inf) $ expand prob node
---            comb (r,l) x = (\(!xr,!xl) -> (r++xr,min l xl)) $ ida x
               | otherwise = comb $ ((s node,inf):) $ map ida $ expand prob node
             comb !x = (concatMap fst x,minimum $ map snd x)
             f node  = cost node + heuristic prob node
             s node  = [node | (lim == f node) && goalTest prob (state node)]
+--              | otherwise = foldl' comb (s node,inf) $ expand prob node
+--            comb (r,l) x = (\(!xr,!xl) -> (r++xr,min l xl)) $ ida x
 
---TODO: reformulate this to give an infinite list and use the state monad in rbfs
+--TODO: reformulate this to give an infinite list
 recursiveBestFirstSearch :: (Problem p s a) => p s a -> [Node s a]
 recursiveBestFirstSearch prob = either (:[]) (const []) $ rbfs (root prob) 0 inf where
     rbfs n f lim
@@ -96,9 +96,23 @@ recursiveBestFirstSearch prob = either (:[]) (const []) $ rbfs (root prob) 0 inf
                     nextq x = searchWhile $ pop $ push (x,n1) r
                     bnd = min lim (fst $ fst $ pop r)
 
---recursiveBestFirstSearch' :: (Problem p s a) => p s a -> [Node s a]
---recursiveBestFirstSearch' prob = fst $ rbfs (root prob,0) inf where
---    rbfs (n,f) lim
---      | f > lim = ([],f)
---      | goalTest prob (state n) && h n==f = comb ([n],inf) $ searchWhile
-
+recursiveBestFirstSearch' :: (Problem p s a) => p s a -> [Node s a]
+recursiveBestFirstSearch' prob = fst $ rbfs (root prob) 0 10 where
+--    rbfs :: (Problem p s a) => Node s a -> Cost -> Cost -> ([Node s a],Cost)
+    rbfs node f lim
+      | f > lim = ([],f)
+      | L.null succ = s ([],inf)
+      | L.null (tail succ) = let n = head succ in s $ rbfs n (max f (h n)) lim
+      | otherwise = s $ searchWhile $ pop (extend (map initvalues succ) (newPriorityQueue snd))
+        where
+            s (x,y) = ([node | (h node>=f) && goalTest prob (state node)]++x,y)
+            succ = expand prob node
+            h n  = heuristic prob n + cost n
+            initvalues x = if h node<f then (x,max f (h x)) else (x,h x)
+--            searchWhile :: ((Node s a,Cost),Queue) -> ([Node s a],Cost)
+            searchWhile ((n1,fn1),rq)
+              | fn1 > lim || fn1 == inf = ([],fn1)
+              | otherwise = comb (rbfs n1 fn1 bnd)
+                where
+                    comb (x,y) = (\(x1,y1) -> (x++x1,y1)) $ searchWhile $ pop $ push (n1,y) rq
+                    bnd = min lim (snd $ fst $ pop rq)
