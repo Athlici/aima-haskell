@@ -39,7 +39,7 @@ showTable pad xs header rownames =
         rows   = map (showRow pad "|") rows'
     in [hzline,hdline,hzline] ++ rows ++ [hzline]
 
--- |Convert a single row of a table to a string, padding each cell so that 
+-- |Convert a single row of a table to a string, padding each cell so that
 --  it is of uniform width.
 showRow :: Int -> String -> [String] -> String
 showRow pad sep xs = sep ++ concatMap showCell cells

@@ -1,13 +1,14 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module AI.Search.Example.NQueens where
 
-import qualified Data.List as L
-import Data.Maybe (isJust)
+import qualified Data.List            as L
+import           Data.Maybe           (isJust)
 
-import AI.Search.Core
-import AI.Util.Util
-import AI.Search.Uninformed
+import           AI.Search.Core
+import           AI.Search.Uninformed
+import           AI.Util.Util
 
 ----------------------
 -- N Queens Problem --
@@ -33,7 +34,7 @@ conflicted state row col = any f (enumerate state)
         f (_, Nothing) = False
         f (c, Just r)  = not (c == col && r == row) && conflict row col r c
 
--- |N-Queens is an instance of Problem. 
+-- |N-Queens is an instance of Problem.
 instance Problem NQueens [Maybe Int] (Int,Int) where
     initial (NQ n) = replicate n Nothing
 

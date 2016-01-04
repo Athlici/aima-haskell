@@ -1,7 +1,7 @@
 module AI.Search.Example.Qwirkle where
 
-import qualified Data.Map as M
 import qualified Data.List as L
+import qualified Data.Map  as M
 
 data Qwirkle h o = QG {hand :: [Stone], order :: [Player]} deriving (Show)
 
@@ -35,7 +35,7 @@ instance Game Qwirkle QState QMove where
 --        allStones = [Stone Yellow Circle..Stone Purple Flower]
         allStones = []
 --0 score for every player, ord has to be finite and duplicate free
---        nullscore = L.map (\x -> 0) o 
+--        nullscore = L.map (\x -> 0) o
         nullscore = L.replicate (L.length o) 0
         opprobs = []  --do much statistics here, such wow
 

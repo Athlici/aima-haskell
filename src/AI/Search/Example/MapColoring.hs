@@ -1,13 +1,14 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module AI.Search.Example.MapColoring where
 
-import Data.Map (Map, (!))
-import qualified Data.Map as M
+import           Data.Map      (Map, (!))
+import qualified Data.Map      as M
 
-import AI.Search.CSP
-import AI.Util.Graph (Graph)
-import AI.Util.Util
+import           AI.Search.CSP
+import           AI.Util.Graph (Graph)
+import           AI.Util.Util
 
 import qualified AI.Util.Graph as G
 
@@ -17,7 +18,7 @@ import qualified AI.Util.Graph as G
 
 data MapColoringCSP v a = MCP
     { neighboursMC :: Graph String
-    , colorsMC :: String } deriving (Show)
+    , colorsMC     :: String } deriving (Show)
 
 instance CSP MapColoringCSP String Char where
     vars (MCP nbrs _) = M.keys nbrs
@@ -27,8 +28,8 @@ instance CSP MapColoringCSP String Char where
     neighbours (MCP nbrs _) = nbrs
 
     constraints csp x xv y yv =  xv /=yv || notElem y (neighbours csp ! x)
-        
-        
+
+
 
 -----------------------------------
 -- Map Coloring Problems in AIMA --

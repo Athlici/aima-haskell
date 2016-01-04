@@ -1,7 +1,7 @@
 module AI.Learning.Core where
 
-import Numeric.LinearAlgebra
-import Numeric.GSL.Minimization
+import           Numeric.GSL.Minimization
+import           Numeric.LinearAlgebra
 
 ---------------
 -- Utilities --

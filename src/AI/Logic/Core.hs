@@ -12,12 +12,12 @@ module AI.Logic.Core (
     , LogicError(..)
     ) where
 
-import Control.Monad.Except
-import Control.Exception
-import Control.Monad.State
-import Data.Map (Map)
+import           Control.Exception
+import           Control.Monad.Except
+import           Control.Monad.State
+import           Data.Map             (Map)
 
-import AI.Util.Util
+import           AI.Util.Util
 
 ----------------
 -- Data Types --

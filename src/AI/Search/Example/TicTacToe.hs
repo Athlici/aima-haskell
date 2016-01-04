@@ -1,14 +1,16 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
 
 module AI.Search.Example.TicTacToe where
 
-import Data.Map (Map)
-import Data.Maybe (catMaybes)
-import qualified Data.Map as M
-import qualified Data.List as L
+import qualified Data.List             as L
+import           Data.Map              (Map)
+import qualified Data.Map              as M
+import           Data.Maybe            (catMaybes)
 
-import AI.Search.Adversarial
-import AI.Util.Util
+import           AI.Search.Adversarial
+import           AI.Util.Util
 
 ----------------------------------
 -- Tic Tac Toe on a H x V board --
@@ -25,17 +27,17 @@ type TTMove = (Int,Int)
 data TTCounter = O | X deriving (Eq,Show)
 
 -- |A tic tac toe board is a map from board positions to counters. Note that
---  @M.lookup (x,y) board@ will return @Nothing@ if square @(x,y)@ is empty. 
+--  @M.lookup (x,y) board@ will return @Nothing@ if square @(x,y)@ is empty.
 type TTBoard = Map TTMove TTCounter
 
 -- |The state of a tic tac toe game is defined by the board. We also store the
 --  player whose move is next, the utility of this state (which is only nonzero
 --  if the state is terminal) and the size of the board, for convenience.
 data TTState = TTS
-    { boardTT :: TTBoard
-    , toMoveTT :: TTCounter
+    { boardTT   :: TTBoard
+    , toMoveTT  :: TTCounter
     , utilityTT :: Utility
-    , limsTT :: (Int,Int,Int) }
+    , limsTT    :: (Int,Int,Int) }
 
 -- |This 'Game' instance defines the rules of tic tac toe. Note that whenever
 --  a move is made, we compute the utility of the newly created state on the
@@ -169,7 +171,7 @@ allLines s = concat [ linesInDir s (1,0), linesInDir s (0,1)
 
 -- |Return all of the lines on the board in the specified direction.
 linesInDir :: TTState -> (Int,Int) -> [[Maybe TTCounter]]
-linesInDir s@(TTS board _ _ (h,v,k)) dir = 
+linesInDir s@(TTS board _ _ (h,v,k)) dir =
     map (\p -> lineThrough s p dir) pts
     where
         pts = case dir of
@@ -180,7 +182,7 @@ linesInDir s@(TTS board _ _ (h,v,k)) dir =
 
 -- |Return the line starting in cell (x,y) and continuing in direction (dx,dy)
 lineThrough :: TTState -> (Int,Int) -> (Int,Int) -> [Maybe TTCounter]
-lineThrough (TTS board _ _ (h,v,k)) (x,y) (dx,dy) = 
+lineThrough (TTS board _ _ (h,v,k)) (x,y) (dx,dy) =
     take k $ map (`M.lookup` board) ( zip [x,x+dx..] [y,y+dy..] )
 
 ----------

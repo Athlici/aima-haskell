@@ -1,12 +1,14 @@
-{-# LANGUAGE FunctionalDependencies, FlexibleInstances, FlexibleContexts, BangPatterns #-}
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleInstances      #-}
+{-# LANGUAGE FunctionalDependencies #-}
 
 module AI.Learning.LinearRegression where
 
-import Data.List (foldl')
-import Numeric.LinearAlgebra
-import Numeric.LinearAlgebra.Util (ones)
+import           Data.List                  (foldl')
+import           Numeric.LinearAlgebra
+import           Numeric.LinearAlgebra.Util (ones)
 
-import AI.Util.Matrix
+import           AI.Util.Matrix
 
 {-
 
@@ -27,7 +29,7 @@ A linear model should contain the following information:
 * PRESS Statistic
 * R squared
 * adjusted r squared
-* 
+*
 
 -}
 
@@ -44,7 +46,7 @@ data LMType = OLS
             deriving (Show)
 
 ---- |Data type for linear regression options.
-data LMOpts = LMOpts { fitIntercept :: Bool
+data LMOpts = LMOpts { fitIntercept          :: Bool
                      , standardizeRegressors :: Bool }
                      deriving (Show)
 
@@ -59,22 +61,22 @@ stdLMOpts = LMOpts { fitIntercept = True
 -- |Data type for a linear model. It consists of the coefficient vector,
 --  together with options that specify how to transform any data that is used
 --  to make new predictions.
-data LinearModel = LM { coefs   :: Vector Double
-                      , lmIntercept :: Bool
+data LinearModel = LM { coefs         :: Vector Double
+                      , lmIntercept   :: Bool
                       , lmStandardize :: Bool
-                      , lmMean :: Vector Double
-                      , lmStd  :: Vector Double }
+                      , lmMean        :: Vector Double
+                      , lmStd         :: Vector Double }
                       deriving (Show)
 
 -- |Statistics structure for a linear regression.
-data LMStats = LMStats { covBeta :: Maybe (Matrix Double)
-                       , betaCI :: Maybe (Matrix Double)
-                       , sst :: Double
-                       , sse :: Double
-                       , mse :: Double
-                       , rSquare :: Double
-                       , tBeta :: Maybe (Vector Double)
-                       , pBeta :: Maybe (Vector Double)
+data LMStats = LMStats { covBeta     :: Maybe (Matrix Double)
+                       , betaCI      :: Maybe (Matrix Double)
+                       , sst         :: Double
+                       , sse         :: Double
+                       , mse         :: Double
+                       , rSquare     :: Double
+                       , tBeta       :: Maybe (Vector Double)
+                       , pBeta       :: Maybe (Vector Double)
                        , fRegression :: Maybe Double
                        , pRegression :: Maybe Double }
                        deriving (Show)
@@ -110,7 +112,7 @@ lmWith kind opts x y = LM { coefs = beta
 lmPrepare :: LMOpts
           -> Matrix Double
           -> (Matrix Double, Vector Double, Vector Double)
-lmPrepare opts x = (x3,mu,sigma) 
+lmPrepare opts x = (x3,mu,sigma)
     where
         (x1,mu,sigma) = standardize x
         x2            = if standardizeRegressors opts then x1 else x
@@ -214,7 +216,7 @@ standardize m = (eachRow (\x -> (x - mu) / sigma) m, mu, sigma)
 --  the function discards the mean and standard deviation vectors, only
 --  returning the standardized sample.
 standardize_ :: Matrix Double -> Matrix Double
-standardize_ x = a where (a,_,_) = standardize x 
+standardize_ x = a where (a,_,_) = standardize x
 
 -------------------------
 -- Mean, Variance etc. --

@@ -1,8 +1,10 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, PatternGuards #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PatternGuards         #-}
 
 module AI.Search.Core (
     -- * Core classes and data structures
-      Problem (..)  
+      Problem (..)
     , Node (..)
     , Cost
     , root
@@ -18,17 +20,17 @@ module AI.Search.Core (
     , ProblemIO
     , mkProblemIO) where
 
-import Control.DeepSeq
-import Control.Monad
-import Data.IORef
-import Data.Maybe (fromJust,listToMaybe)
-import System.IO.Unsafe
+import           Control.DeepSeq
+import           Control.Monad
+import           Data.IORef
+import           Data.Maybe       (fromJust, listToMaybe)
+import           System.IO.Unsafe
 
-import qualified Data.Set as S
+import qualified Data.Set         as S
 
-import AI.Util.Queue
-import AI.Util.Table
-import AI.Util.Util
+import           AI.Util.Queue
+import           AI.Util.Table
+import           AI.Util.Util
 
 --import qualified AI.Util.Graph as G
 
@@ -46,7 +48,7 @@ class Eq s => Problem p s a where
     --   from this state. Because of lazy evaluation we only ever compute as
     --   many elements of the list as the program needs.
     successor :: p s a -> s -> [(a, s)]
-    
+
     -- | If the problem has a unique goal state, this method should return it.
     --   The default implementation of 'goalTest' compares for equality with
     --   this state.
@@ -98,7 +100,7 @@ data Node s a = Node { state  :: s
 
 instance (Show s, Show a) => Show (Node s a) where
     show (Node state _ action cost depth _) =
-        "Node(state=" ++ show state ++ ",action=" ++ show action ++ 
+        "Node(state=" ++ show state ++ ",action=" ++ show action ++
             ",cost=" ++ show cost ++ ",depth=" ++ show depth ++ ")"
 
 -- Ignores actions; primarily because it's messy and also because two actions which
@@ -142,7 +144,7 @@ treeSearch :: (Problem p s a, Queue q) =>
               q (Node s a)      -- ^ Empty queue
            -> p s a             -- ^ Problem
            -> [Node s a]
-treeSearch q prob  = genericSearch f q prob 
+treeSearch q prob  = genericSearch f q prob
     where
         f node closed = (expand prob node,closed)
 
@@ -154,23 +156,23 @@ graphSearch :: (Problem p s a, Queue q, Ord s) =>
             -> p s a            -- ^ Problem
             -> [Node s a]
 graphSearch q prob = genericSearch f q prob
-    where 
-        f node closed 
+    where
+        f node closed
             | state node `S.member` closed  = (newQueue,closed)
             | otherwise = (expand prob node, closed')
                 where
-                    closed' = state node `S.insert` closed 
+                    closed' = state node `S.insert` closed
 
 
 genericSearch :: (Queue q, Problem p s a) =>
                        (Node s a -> S.Set a1 -> ([Node s a], S.Set a1))
                        -> q (Node s a) -> p s a -> [Node s a]
 genericSearch f q prob = findFinalState (genericSearchPath f (root prob `push` q))
-    where 
-        findFinalState = filter (goalTest prob.state) 
+    where
+        findFinalState = filter (goalTest prob.state)
 
 -- Return a (potentially infinite) list of nodes to search.
--- Since the result is lazy, you can break out early if you find a result. 
+-- Since the result is lazy, you can break out early if you find a result.
 genericSearchPath :: Queue q => (a -> S.Set a1 -> ([a], S.Set a1)) -> q a -> [a]
 genericSearchPath f q  = go (q,S.empty)
     where
@@ -236,7 +238,7 @@ testSearcher prob searcher = do
 
 -- |NFData instance for search nodes.
 instance (NFData s, NFData a) => NFData (Node s a) where
-    rnf (Node state parent action cost depth value) = 
+    rnf (Node state parent action cost depth value) =
         state `seq` parent `seq` action `seq`
         cost `seq` depth `seq` value `seq`
         Node state parent action cost depth value `seq` ()
@@ -264,7 +266,7 @@ compareSearchers :: (Show a) =>
                  -> [p s a]                  -- ^ List of problems
                  -> [String]                 -- ^ Problem names
                  -> [String]                 -- ^ Search algorithm names
-                 -> IO [[(Maybe (Node s a),Int,Int,Int)]] 
+                 -> IO [[(Maybe (Node s a),Int,Int,Int)]]
 compareSearchers searchers probs header rownames = do
     results <- testSearchers searchers `mapM` probs
     printTable 20 (map (map f) (transpose results)) header rownames
@@ -273,9 +275,9 @@ compareSearchers searchers probs header rownames = do
         f (x,i,j,k) = SB (i,j,k)
 
 -- |Given a problem and a list of searchers, run each search algorithm over the
---  problem until they find the first solution or exhaust the space, and print out 
---  a table showing the performance of each searcher. The columns of the table indicate: 
---  [Algorithm name, Depth of solution, Cost of solution, Number of goal checks, 
+--  problem until they find the first solution or exhaust the space, and print out
+--  a table showing the performance of each searcher. The columns of the table indicate:
+--  [Algorithm name, Depth of solution, Cost of solution, Number of goal checks,
 --  Number of node expansions, Number of states expanded] .
 detailedCompareSearchers ::
         [ProblemIO p s a -> [Node s a]]     -- ^ List of searchers

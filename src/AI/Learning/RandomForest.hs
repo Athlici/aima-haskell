@@ -1,10 +1,10 @@
 module AI.Learning.RandomForest where
 
-import Control.Monad
-import Control.Monad.Random
+import           Control.Monad
+import           Control.Monad.Random
 
-import AI.Learning.DecisionTree as D
-import AI.Util.Util
+import           AI.Learning.DecisionTree as D
+import           AI.Util.Util
 
 -- |A forest is a list of decision trees.
 newtype Forest a b = Forest [D.DTree a () b] deriving (Show)

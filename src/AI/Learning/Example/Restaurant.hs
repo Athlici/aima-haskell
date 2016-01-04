@@ -1,14 +1,14 @@
 module AI.Learning.Example.Restaurant where
 
-import Control.Monad
-import Control.Monad.Random
-import qualified Graphics.Gnuplot.Simple as G
-import System.IO.Unsafe
+import           Control.Monad
+import           Control.Monad.Random
+import qualified Graphics.Gnuplot.Simple  as G
+import           System.IO.Unsafe
 
-import AI.Learning.Core
-import AI.Learning.DecisionTree
+import           AI.Learning.Core
+import           AI.Learning.DecisionTree
 import qualified AI.Learning.RandomForest as RF
-import AI.Util.Util
+import           AI.Util.Util
 
 data Patrons = Empty | Some | Full deriving (Show,Eq,Ord,Enum,Bounded)
 data Price = Cheap | Medium | Expensive deriving (Show,Eq,Ord,Enum,Bounded)
@@ -16,16 +16,16 @@ data Type = French | Thai | Burger | Italian deriving (Show,Eq,Ord,Enum,Bounded)
 data Wait = None | Short | Med | Long deriving (Show,Eq,Ord,Enum,Bounded)
 
 data Restaurant = Restaurant {
-    alt :: Bool,        -- is there an alternative?
-    bar :: Bool,        -- is there a bar?
-    fri :: Bool,        -- is it a friday?
-    hun :: Bool,        -- are you hungry?
-    pat :: Patrons,     -- how many patrons are there?
-    price :: Price,     -- how cheap is it?
-    rain :: Bool,       -- is it raining?
-    res :: Bool,        -- do you have a reservation?
-    food :: Type,       -- what type of food is it?
-    wait :: Wait,       -- what is the wait?
+    alt      :: Bool,        -- is there an alternative?
+    bar      :: Bool,        -- is there a bar?
+    fri      :: Bool,        -- is it a friday?
+    hun      :: Bool,        -- are you hungry?
+    pat      :: Patrons,     -- how many patrons are there?
+    price    :: Price,     -- how cheap is it?
+    rain     :: Bool,       -- is it raining?
+    res      :: Bool,        -- do you have a reservation?
+    food     :: Type,       -- what type of food is it?
+    wait     :: Wait,       -- what is the wait?
     willWait :: Bool    -- will you wait?
 } deriving (Show,Eq,Ord)
 
@@ -196,10 +196,10 @@ actualTree = do
         Long  -> return False
 
 ------------------------------------------
--- This is the example in AIMA Fig 18.3 -- 
+-- This is the example in AIMA Fig 18.3 --
 ------------------------------------------
 
-restaurants = 
+restaurants =
   [ Restaurant True False False True Some Expensive False True French None True
   , Restaurant True False False True Full Cheap False False Thai Med False
   , Restaurant False True False False Some Cheap False False Burger None True

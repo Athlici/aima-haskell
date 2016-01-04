@@ -1,4 +1,4 @@
-import AI.Learning.Example.Restaurant
+import           AI.Learning.Example.Restaurant
 
 main :: IO ()
 main = demo1

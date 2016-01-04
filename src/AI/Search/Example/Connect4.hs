@@ -1,14 +1,15 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module AI.Search.Example.Connect4 where
 
-import Data.Ord (comparing)
-import qualified Data.Map as M
-import qualified Data.List as L
+import qualified Data.List                   as L
+import qualified Data.Map                    as M
+import           Data.Ord                    (comparing)
 
-import AI.Search.Adversarial
-import AI.Search.Example.TicTacToe
-import AI.Util.Util
+import           AI.Search.Adversarial
+import           AI.Search.Example.TicTacToe
+import           AI.Util.Util
 
 ---------------
 -- Connect 4 --
@@ -50,7 +51,7 @@ instance Game Connect4 C4State C4Move where
 
 -- |Return the lowest row in the specified column which is currently unoccupied.
 lowestUnoccupied :: Int -> TTState -> Int
-lowestUnoccupied col (TTS board _ _ (_,v,_)) = 
+lowestUnoccupied col (TTS board _ _ (_,v,_)) =
     let coords   = map (\row -> (col,row)) [0..v-1]
         counters = map (`M.lookup` board) coords
     in countIf (/=Nothing) counters --isJust?

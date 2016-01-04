@@ -1,19 +1,22 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleContexts, TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
 
 module AI.Search.CSP where
 
-import Control.Monad.Reader
-import Control.Monad.State
-import Control.Monad (liftM)
-import Data.Map (Map, (!))
-import System.Random
+import           Control.Monad        (liftM)
+import           Control.Monad.Reader
+import           Control.Monad.State
+import           Data.Map             (Map, (!))
+import           System.Random
 
-import qualified Data.List as L
-import qualified Data.Map as M
-import qualified Data.Ord as O
+import qualified Data.List            as L
+import qualified Data.Map             as M
+import qualified Data.Ord             as O
 
-import AI.Util.Queue
-import AI.Util.Util
+import           AI.Util.Queue
+import           AI.Util.Util
 
 -- |Data type used for domains.
 type Domain a b = Map a [b]
@@ -113,7 +116,7 @@ allAssigned :: CSP c v a => c v a -> Assignment v a -> Bool
 allAssigned csp assignment = M.size assignment == length (vars csp)
 
 hasConflicts :: CSP c v a => c v a -> v -> a -> Assignment v a -> Bool
-hasConflicts  csp v a  = not . M.null . M.filterWithKey conflict 
+hasConflicts  csp v a  = not . M.null . M.filterWithKey conflict
     where
         conflict x y = not $ constraints csp v a x y
 
@@ -171,8 +174,8 @@ recursiveBacktracking csp = getAssignment >>= \assgn ->
                                 then unassign csp var >> go var vs
                                 else return result
                     else go var vs
-            
-            noConflicts var v a = not $ hasConflicts csp var v a 
+
+            noConflicts var v a = not $ hasConflicts csp var v a
 
 -- |Select an unassigned variable from the list of variables in a CSP. We may
 --  optionally use the Most Constrained Variable heuristic to choose which
@@ -197,7 +200,7 @@ mostConstrained vs = do
     assgn <- getAssignment
     let unassigned = [ v | v <- vs, v `M.notMember` assgn ]
     return $! argMin unassigned (numLegalValues dom)
-    
+
 
 
 -- |Return the first unassigned variable in the problem.
@@ -296,7 +299,7 @@ minConflicts gen csp maxSteps = go g 0 initial
         go g steps current =
             let conflicted = conflictedVars csp current
              in if steps == maxSteps || null conflicted
-                    then current 
+                    then current
                     else let (var, g1) = randomChoice g conflicted
                              (val, g2) = minConflictsValue g1 csp var current
                           in go g2 (steps+1) (M.insert var val current)
@@ -308,10 +311,10 @@ initialAssignment :: (CSP c v a, RandomGen g) => g -> c v a -> (Assignment v a, 
 initialAssignment g csp = go g (vars csp) M.empty
     where
         go g []         current = (current, g)
-        go g (var:rest) current = 
+        go g (var:rest) current =
             let (val, g') = minConflictsValue g csp var current
              in go g' rest (M.insert var val current)
-            
+
 
 -- |Return the value that will give a variable the least number of conflicts.
 --  If there is a tie, choose at random.
@@ -324,7 +327,7 @@ minConflictsValue g csp var current =
 -----------------------
 
 -- |Options for recursive backtracking. We allow the following options:
---  
+--
 --  * 'mcv' - use the Most Constrained Variable heuristic
 --
 --  * 'lcv' - use the Least Constraining Variable heuristic

@@ -3,22 +3,22 @@
 
 module AI.Learning.DecisionTree where
 
-import Control.Monad.Random
-import Control.Monad (ap)
-import Data.Map (Map, (!))
-import Data.Ord (comparing)
-import qualified Data.List as L
-import qualified Data.Map as M
+import           Control.Monad        (ap)
+import           Control.Monad.Random
+import qualified Data.List            as L
+import           Data.Map             (Map, (!))
+import qualified Data.Map             as M
+import           Data.Ord             (comparing)
 
-import AI.Util.Util
+import           AI.Util.Util
 
 ----------------
 -- Attributes --
 ----------------
 
 -- |An attribute is anything that can split the data into a number of classes.
-data Att a = Att { test :: a -> Int
-                 , vals :: [Int]
+data Att a = Att { test  :: a -> Int
+                 , vals  :: [Int]
                  , label :: String }
 
 instance Show (Att a) where
@@ -39,7 +39,7 @@ data DTree a i b = Result b
 
 instance Show b => Show (DTree a i b) where
     show (Result b) = show b
-    show (Decision att _ ts) = 
+    show (Decision att _ ts) =
         "Decision " ++ show att ++ " " ++ show (M.elems ts)
 
 instance Functor (DTree a i) where
@@ -150,7 +150,7 @@ maxDecisions _ r = r
 -- |Prune decisions using a predicate.
 prune :: (b -> Bool) -> DTree a b b -> DTree a b b
 prune _ (Result b)          = Result b
-prune p (Decision att i ts) = 
+prune p (Decision att i ts) =
     if p i
     then Result i
     else Decision att i (fmap (prune p) ts)
@@ -166,7 +166,7 @@ mcr :: Eq b =>
     -> [a]          -- List of elements to be classified
     -> [b]          -- List of correct classifications
     -> Double       -- Misclassification rate
-mcr predfun as bs = 
+mcr predfun as bs =
     let bsPred     = map predfun as
         numCorrect = countIf id (zipWith (==) bs bsPred)
         numTotal   = length as

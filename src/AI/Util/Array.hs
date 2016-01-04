@@ -4,8 +4,8 @@
 --  store the functions that do this.
 module AI.Util.Array where
 
-import qualified Data.List as L
-import AI.Util.Util
+import           AI.Util.Util
+import qualified Data.List    as L
 
 -- |Given a list of 'Int' in [0,1] that index an n-dimensional array, convert it
 --  to a single 'Int' that represents that index in a 1-d array.

@@ -7,13 +7,13 @@ module AI.Probability.MDP
     , valueIteration
     , policyIteration ) where
 
-import Data.Map (Map, (!))
-import GHC.Float
+import           Data.Map         (Map, (!))
+import           GHC.Float
 
-import qualified Data.Map as Map
+import qualified Data.Map         as Map
 
-import AI.Util.ProbDist
-import AI.Util.Util
+import           AI.Util.ProbDist
+import           AI.Util.Util
 
 -- |Type for a utility function (a mapping from states to utilities)
 type Utility s = s -> Double

@@ -2,14 +2,14 @@
 
 module AI.Util.ProbDist where
 
-import Control.Applicative
-import Control.Monad
-import Control.Monad.Random hiding (uniform)
-import Data.Map (Map)
-import GHC.Float
+import           Control.Applicative
+import           Control.Monad
+import           Control.Monad.Random hiding (uniform)
+import           Data.Map             (Map)
+import           GHC.Float
 
-import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.List            as L
+import qualified Data.Map             as M
 
 type Prob = Float
 

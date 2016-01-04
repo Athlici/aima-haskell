@@ -1,10 +1,10 @@
 module AI.Test.Util where
 
-import Data.Packed.Vector
-import Data.Packed.Matrix
-import Foreign.Storable
-import Numeric.Container
-import Test.QuickCheck hiding ((><))
+import           Data.Packed.Matrix
+import           Data.Packed.Vector
+import           Foreign.Storable
+import           Numeric.Container
+import           Test.QuickCheck    hiding ((><))
 
 arbitraryGaussianVector :: Int -> Gen (Vector Double)
 arbitraryGaussianVector n = do

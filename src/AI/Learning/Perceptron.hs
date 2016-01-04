@@ -1,7 +1,7 @@
 module AI.Learning.Perceptron where
 
-import Numeric.LinearAlgebra
-import Numeric.LinearAlgebra.Util
+import           Numeric.LinearAlgebra
+import           Numeric.LinearAlgebra.Util
 
 perceptronPredict :: Vector Double -> Matrix Double -> Vector Double
 perceptronPredict weights x = step (x <> weights)

@@ -1,21 +1,22 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module AI.Logic.Propositional where
 
-import Control.Applicative ((<$>))
-import Control.Monad.Except
-import Control.Monad.State
-import Data.Map (Map, (!))
-import Text.ParserCombinators.Parsec
-import Text.Parsec.Char
-import Text.Parsec.Expr
-import Text.Parsec.Token hiding (parens)
+import           Control.Applicative           ((<$>))
+import           Control.Monad.Except
+import           Control.Monad.State
+import           Data.Map                      (Map, (!))
+import           Text.Parsec.Char
+import           Text.Parsec.Expr
+import           Text.Parsec.Token             hiding (parens)
+import           Text.ParserCombinators.Parsec
 
-import AI.Logic.Core
-import qualified Data.List as L
-import qualified Data.Map as M
+import           AI.Logic.Core
+import qualified Data.List                     as L
+import qualified Data.Map                      as M
 
-import AI.Util.Util
+import           AI.Util.Util
 
 ----------------
 -- Data Types --
@@ -90,7 +91,7 @@ instance KB DefClauseKB DefiniteClause Bool where
     retract (DC cs) c = DC $ L.delete c cs
     ask     (DC cs) c = isFact c && fcEntails cs (conclusion c)
     askVars           = undefined
-    axioms  (DC cs)   = cs 
+    axioms  (DC cs)   = cs
 
 -----------------------------------
 -- Propositional Logic Utilities --
@@ -146,11 +147,11 @@ ttEntails s t = and $ ttCheck (s `Implies` t)
 --  models.
 ttCheck :: PLExpr -> [Bool]
 ttCheck expr = map check $ allModels (vars expr)
-    where   
+    where
         check model = case plTrue model expr of
             Nothing -> error "Should never see this."
             Just v  -> v
-            
+
         allModels vars = map (zip vars) (bools $ length vars)
 
 -- |Is the propositional sentence a tautology - is it true in all possible
@@ -303,11 +304,11 @@ plResolve p q =
 
 type Symbol = String
 
-data DefiniteClause = DefiniteClause { premises :: [Symbol]
+data DefiniteClause = DefiniteClause { premises   :: [Symbol]
                                      , conclusion :: Symbol } deriving (Eq,Ord)
 
 instance Show DefiniteClause where
-    show (DefiniteClause []   hd) = hd 
+    show (DefiniteClause []   hd) = hd
     show (DefiniteClause body hd) =
         L.intercalate " & " body ++ " => " ++ hd
 
@@ -395,7 +396,7 @@ parens p = do
     spaces >> char ')'
     return x
 
-table = 
+table =
     [ [prefix "~" Not]
     , [binary "&" (\x y -> And [x,y]) AssocLeft]
     , [binary "|" (\x y -> Or [x,y]) AssocLeft]

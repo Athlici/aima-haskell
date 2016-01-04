@@ -6,7 +6,7 @@ module AI.Probability.Example.Grass
     , AI.Probability.Bayes.likelihoodWeighting
     ) where
 
-import AI.Probability.Bayes
+import           AI.Probability.Bayes
 
 -- |The "grass" example from AIMA. You can query the network using any of the
 --  ask functions. For example, to query the distribution of /Rain/ given

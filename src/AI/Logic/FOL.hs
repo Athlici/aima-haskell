@@ -2,20 +2,20 @@
 
 module AI.Logic.FOL where
 
-import Control.Monad.Except
-import Data.Map (Map, (!))
-import Data.Maybe (mapMaybe)
-import Data.Unique
-import System.IO.Unsafe
-import Text.ParserCombinators.Parsec
-import Text.Parsec.Char
-import Text.Parsec.Expr
+import           Control.Monad.Except
+import           Data.Map                      (Map, (!))
+import           Data.Maybe                    (mapMaybe)
+import           Data.Unique
+import           System.IO.Unsafe
+import           Text.Parsec.Char
+import           Text.Parsec.Expr
+import           Text.ParserCombinators.Parsec
 
-import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.List                     as L
+import qualified Data.Map                      as M
 
-import AI.Logic.Core
-import AI.Util.Util
+import           AI.Logic.Core
+import           AI.Util.Util
 
 ----------------
 -- Data Types --
@@ -105,7 +105,7 @@ unify' x y (Just theta)
     | isVar y = unifyVar (getVar y) x theta
     | isExpr x && isExpr y =
         unify' (getArgs x) (getArgs y) (unify' (getOp x) (getOp y) (Just theta))
-    | isList x && isList y && (getLength x == getLength y) = 
+    | isList x && isList y && (getLength x == getLength y) =
         unify' (getRest x) (getRest y) (unify' (getHd x) (getHd y) (Just theta))
     | otherwise = Nothing
 
@@ -130,9 +130,9 @@ occurCheck var x
 ----------------------
 
 data Statement = Statement { symbol :: String
-                           , args :: [Term] } deriving (Eq)
+                           , args   :: [Term] } deriving (Eq)
 
-data DefiniteClause = DC { premises :: [Statement]
+data DefiniteClause = DC { premises   :: [Statement]
                          , conclusion :: Statement } deriving (Eq)
 
 instance Show Statement where
@@ -238,7 +238,7 @@ isRenaming s kb = notNull $ mapMaybe (stUnify [s] . return) kb
 
 getSubstitutions :: [Statement] -> [Statement] -> [Map String Term]
 getSubstitutions ps kb = mapMaybe (stUnify ps) (subsets kb)
-          
+
 ----------------------
 -- Rename Variables --
 ----------------------
@@ -429,7 +429,7 @@ parens p = do
     spaces >> char ')'
     return x
 
-table = 
+table =
     [ [prefix "~" Not]
     , [binary "&" (\x y -> And [x,y]) AssocLeft]
     , [binary "|" (\x y -> Or [x,y]) AssocLeft]

@@ -1,5 +1,5 @@
-import AI.Probability.Example.Alarm
-import AI.Util.ProbDist
+import           AI.Probability.Example.Alarm
+import           AI.Util.ProbDist
 
 n :: Int
 n = 100000

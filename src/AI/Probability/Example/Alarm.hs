@@ -6,7 +6,7 @@ module AI.Probability.Example.Alarm
     , AI.Probability.Bayes.likelihoodWeighting
     ) where
 
-import AI.Probability.Bayes
+import           AI.Probability.Bayes
 
 -- |The "alarm" example from AIMA. You can query the network using any of the
 --  ask functions. For example, to query the distribution of /Burglary/ given

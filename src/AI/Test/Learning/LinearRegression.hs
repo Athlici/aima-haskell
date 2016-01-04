@@ -1,13 +1,13 @@
 module AI.Test.Learning.LinearRegression (runAllTests) where
 
-import Data.Packed.Matrix
-import Data.Packed.Vector
-import Numeric.Container
-import Test.QuickCheck
+import           Data.Packed.Matrix
+import           Data.Packed.Vector
+import           Numeric.Container
+import           Test.QuickCheck
 
-import AI.Learning.LinearRegression
-import AI.Util.Matrix
-import AI.Test.Util
+import           AI.Learning.LinearRegression
+import           AI.Test.Util
+import           AI.Util.Matrix
 
 -- |Regressing against a column of zeros should return a zero result vector.
 testRegressionAgainstZeros :: Gen Bool

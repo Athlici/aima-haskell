@@ -1,16 +1,17 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module AI.Search.Example.Sudoku where
 
-import Control.Monad
-import Data.Map (Map, (!))
-import Data.Text (pack, unpack, chunksOf)
+import           Control.Monad
+import           Data.Map      (Map, (!))
+import           Data.Text     (chunksOf, pack, unpack)
 
-import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.List     as L
+import qualified Data.Map      as M
 
-import AI.Search.CSP
-import AI.Util.Util
+import           AI.Search.CSP
+import           AI.Util.Util
 
 ------------
 -- Sudoku --
@@ -23,8 +24,8 @@ instance CSP Sudoku String Char where
     domains (Sudoku dom) = dom
     neighbours s = M.fromList peers
     constraints s x xv y yv = (xv /= yv) || notElem x (neighbours s ! y)
-        
-        
+
+
 
 cross :: [a] -> [a] -> [[a]]
 cross xs ys = [ [x,y] | x <- xs, y <- ys ]

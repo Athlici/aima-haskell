@@ -9,9 +9,9 @@ module AI.Util.Graph
     , addUndirectedEdge
     , parseGraph) where
 
-import Data.Map (Map, (!))
-import qualified Data.Map as M
 import qualified Data.List as L
+import           Data.Map  (Map, (!))
+import qualified Data.Map  as M
 import qualified Data.Text as T
 
 -----------------------

@@ -2,9 +2,9 @@
 
 module AI.Util.Matrix where
 
-import Control.Monad.Random hiding (fromList)
-import Foreign.Storable (Storable)
-import Numeric.LinearAlgebra
+import           Control.Monad.Random  hiding (fromList)
+import           Foreign.Storable      (Storable)
+import           Numeric.LinearAlgebra
 
 -- |Return the size of a matrix as a 2-tuple.
 size :: Matrix a -> (Int,Int)

@@ -1,26 +1,26 @@
+{-# LANGUAGE BangPatterns          #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE BangPatterns #-}
 --{-# LANGUAGE FlexibleInstances #-}
 
 module AI.Search.Example.NPuzzle where
 
 --ToDo:Fix imports
-import AI.Search.Core
-import AI.Search.Informed
-import AI.Search.Uninformed
+import           AI.Search.Core
+import           AI.Search.Informed
+import           AI.Search.Uninformed
 
-import Data.Function (on)
-import Data.Vector (Vector,generate,(!))
-import Control.Monad.ST (runST,ST)
+import           Control.Monad.ST     (ST, runST)
+import           Data.Function        (on)
+import           Data.Vector          (Vector, generate, (!))
 
-import qualified Data.Set as S
-import qualified Data.List as L
-import Data.Permute
-import Data.Permute.ST
+import qualified Data.List            as L
+import           Data.Permute
+import           Data.Permute.ST
+import qualified Data.Set             as S
 
 --import System.IO
 
-import System.Random
+import           System.Random
 
 ----------------------
 -- N Puzzle Problem --
@@ -45,7 +45,7 @@ instance Ord Permute where
 
 inbound :: Int -> Int -> NPMove -> Bool
 inbound n m Ri = (m `mod` n) /= n-1
-inbound n m Do = m < n*(n-1) 
+inbound n m Do = m < n*(n-1)
 inbound n m Le = (m `mod` n) /= 0
 inbound n m Up = m >= n
 
@@ -61,7 +61,7 @@ manhattendist n = generate (n*n*n*n) mhd where
 
 mhd3 = manhattendist 3
 
--- |N-Puzzle is an instance of Problem. 
+-- |N-Puzzle is an instance of Problem.
 instance Problem NPuzzle NPState NPMove where
     initial (NP n i) = NPS (inverse $ listPermute (n*n) i) []    --fromList creates a permutation sorting i, might need the inverse
 
@@ -80,7 +80,7 @@ instance Problem NPuzzle NPState NPMove where
 
     goalTest (NP n _) (NPS b _) = b == permute (n*n)
 
-    heuristic (NP n _) (Node (NPS b m) _ _ _ _ _) = 
+    heuristic (NP n _) (Node (NPS b m) _ _ _ _ _) =
         fromIntegral . sum $ map mhd [1..n*n-1] where
             mhd x = mhd3 ! (x*n*n+(b `at` x))
 
@@ -101,7 +101,7 @@ puzzle8 = NP 3 [7,2,4,5,0,6,8,3,1]
 --    hSetBuffering stdout NoBuffering
 --    print $ stateSpaceExploration (NP 4 [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] :: NPuzzle NPState NPMove)
 
---very ugly code to map a permutation to it's lexicographic index 
+--very ugly code to map a permutation to it's lexicographic index
 --factorials from n to 0 as a list.
 factorials :: Int -> [Integer]
 factorials n = reverse $ scanl (*) 1 [1..(fromIntegral n)]
@@ -134,7 +134,7 @@ toIndex' n p = rank' (toInteger n) np (inverse np) where
 fromIndex' :: Int -> Integer -> Permute
 fromIndex' n i = runST $ do
     p <- newPermute n
-    unrank p (toInteger n) i 
+    unrank p (toInteger n) i
     unsafeFreeze p where
         unrank :: MPermute p m => p -> Integer -> Integer -> m p
         unrank p 0 _ = return p
@@ -151,7 +151,7 @@ fromIndex' n i = runST $ do
 --    print $ l == (map ((toIndex' 10000).(fromIndex' 10000)) l)
 
 --instance Enum Permute where
---    toEnum 
+--    toEnum
 --    fromEnum
---    succ 
+--    succ
 --    pred

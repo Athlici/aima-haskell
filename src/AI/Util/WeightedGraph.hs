@@ -10,18 +10,18 @@ module AI.Util.WeightedGraph
     , writeGraphs
     , readGraphs ) where
 
-import Control.Monad (forM_)
-import Data.Map (Map, (!))
-import qualified Data.Map as M
-import qualified Data.List as L
-import qualified Data.Text as T
-import System.IO
+import           Control.Monad (forM_)
+import qualified Data.List     as L
+import           Data.Map      (Map, (!))
+import qualified Data.Map      as M
+import qualified Data.Text     as T
+import           System.IO
 
 ---------------------
 -- Weighted Graphs --
 ---------------------
 
--- |A weighted graph connects vertices (nodes) by edges (actions). Each edge has 
+-- |A weighted graph connects vertices (nodes) by edges (actions). Each edge has
 --  a weight associated with it. To build a graph, call one of the
 --  functions 'toGraph' (for a directed graph) and 'toUndirectedGraph' (for
 --  an undirected graph).
@@ -106,4 +106,4 @@ fromPairRep xs = go xs M.empty
 -- |Take a directed graph in ordered pair representation and add in all of the
 --  reverse links, so that the resulting graph is undirected.
 symmetrize :: (Eq a, Eq b) => [(a,a,b)] -> [(a,a,b)]
-symmetrize xs = L.nub $ concat [ [(a,b,c),(b,a,c)] | (a,b,c) <- xs ] 
+symmetrize xs = L.nub $ concat [ [(a,b,c),(b,a,c)] | (a,b,c) <- xs ]

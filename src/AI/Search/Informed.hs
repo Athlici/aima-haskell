@@ -1,12 +1,12 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns          #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module AI.Search.Informed where
 
-import AI.Search.Core
-import AI.Util.Queue
+import           AI.Search.Core
+import           AI.Util.Queue
 
-import Data.List as L
+import           Data.List      as L
 
 inf = 1/0        --this is stupid but gives the biggest double
 
@@ -51,7 +51,7 @@ greedyBestFirstSearch prob = bestFirstGraphSearch (heuristic prob) prob
 -- |A* search uses a heuristic function that estimates how close each state is
 --  to the goal. It combines this with the path cost so far to get a total
 --  score, and preferentially explores nodes with a lower score. It is optimal
---  whenever the heuristic function is admissible. 
+--  whenever the heuristic function is admissible.
 aStarSearch :: (Problem p s a, Ord s) => p s a -> [Node s a]
 aStarSearch prob = bestFirstGraphSearch (\n -> heuristic prob n + cost n) prob
 
@@ -84,10 +84,10 @@ recursiveBestFirstSearch prob = either (:[]) (const []) $ rbfs (root prob) 0 inf
       | L.null succ = Right inf
       | L.null (tail succ) = let n = head succ in rbfs n (max f (h n)) lim
       | otherwise = searchWhile $ pop (extend (map initvalues succ) (newPriorityQueue fst))
-        where 
+        where
             succ = expand prob n
             h n = heuristic prob n + cost n
---            initvalues = if h n<f then (\x -> (max f (h x),x)) else (\x -> (h x,x))   
+--            initvalues = if h n<f then (\x -> (max f (h x),x)) else (\x -> (h x,x))
             initvalues x = if h n<f then (max f (h x),x) else (h x,x)     --try later whether this gets optimised
             searchWhile ((fn1,n1),r)
               | fn1 > lim || fn1 == inf = Right fn1
@@ -100,5 +100,5 @@ recursiveBestFirstSearch prob = either (:[]) (const []) $ rbfs (root prob) 0 inf
 --recursiveBestFirstSearch' prob = fst $ rbfs (root prob,0) inf where
 --    rbfs (n,f) lim
 --      | f > lim = ([],f)
---      | goalTest prob (state n) && h n==f = comb ([n],inf) $ searchWhile 
+--      | goalTest prob (state n) && h n==f = comb ([n],inf) $ searchWhile
 

@@ -1,12 +1,12 @@
 module AI.Learning.Bootstrap where
 
-import Control.Monad.Random
-import Foreign.Storable (Storable)
-import Numeric.LinearAlgebra
-import qualified Data.List as L
+import           Control.Monad.Random
+import qualified Data.List             as L
+import           Foreign.Storable      (Storable)
+import           Numeric.LinearAlgebra
 
-import AI.Util.Matrix
-import AI.Util.Util
+import           AI.Util.Matrix
+import           AI.Util.Util
 
 ---------------
 -- Bootstrap --

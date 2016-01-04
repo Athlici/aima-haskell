@@ -8,17 +8,17 @@ module AI.Probability.Bayes
     , rejectionSample
     , likelihoodWeighting ) where
 
-import AI.Util.ProbDist
-import AI.Util.Array
-import AI.Util.Util
+import           AI.Util.Array
+import           AI.Util.ProbDist
+import           AI.Util.Util
 
-import Control.DeepSeq
-import Control.Monad
-import Data.Map (Map, (!))
-import Data.Ord (comparing)
+import           Control.DeepSeq
+import           Control.Monad
 import qualified Control.Monad.Random as R
-import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.List            as L
+import           Data.Map             (Map, (!))
+import qualified Data.Map             as M
+import           Data.Ord             (comparing)
 
 ---------------
 -- Bayes Net --
@@ -27,12 +27,12 @@ import qualified Data.Map as M
 -- |A node in a Bayes Net. We keep things very lightweight, storing just a
 --  list of the node's parents and its conditional probability table as a list.
 data Node e = Node { nodeParents :: [e]
-                   , nodeCond :: [Prob] } deriving (Show)
+                   , nodeCond    :: [Prob] } deriving (Show)
 
 -- |A Bayes Net contains two fields - a list of variables ordered from parents
 --  to children, and a 'Map' from variable names to Nodes.
 data BayesNet e = BayesNet { bnVars :: [e]
-                           , bnMap :: Map e (Node e) } deriving (Show)
+                           , bnMap  :: Map e (Node e) } deriving (Show)
 
 -- |This function creates a Bayes Net from a list of elements of the form
 --  (variable, parents, conditional probs). The conditional probability table
@@ -113,7 +113,7 @@ eliminationAsk bn fixed e = go [] (reverse $ bnVars bn)
 --  a factor to be used in the 'eliminationAsk' algorithm.
 mkFactor :: Ord e => BayesNet e -> [(e,Bool)] -> e -> Factor e
 mkFactor bn fixed e = Factor fvar (subSlice cond is)
-    where   
+    where
         vars = e : bnParents bn e
         cond = bnCond bn e ++ map (1-) (bnCond bn e)
         fvar = map fst fixed `deleteAll` vars
@@ -221,7 +221,7 @@ weightedSample bn fixed = go 1.0 (M.fromList fixed) (bnVars bn)
 -- |Repeatedly draw likelihood-weighted samples from a distribution to infer
 --  probabilities from a Bayes Net.
 likelihoodWeighting :: Ord e => Int -> BayesNet e -> [(e,Bool)] -> e -> IO (Dist Bool)
-likelihoodWeighting nIter bn fixed e = 
+likelihoodWeighting nIter bn fixed e =
     foldM func initial [1..nIter] >>= distribution
 
     where

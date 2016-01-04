@@ -1,9 +1,10 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module AI.Search.Example.Fig52Game where
 
-import AI.Search.Adversarial
-import AI.Util.Util
+import           AI.Search.Adversarial
+import           AI.Util.Util
 
 ----------------------------
 -- Example Game (Fig 5.2) --

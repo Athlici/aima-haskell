@@ -1,4 +1,5 @@
-{-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module AI.Learning.NeuralNetwork
     (
@@ -10,13 +11,13 @@ module AI.Learning.NeuralNetwork
     , nnTrainIO
     ) where
 
-import Control.Monad.Random hiding (fromList)
-import Numeric.LinearAlgebra
-import Numeric.LinearAlgebra.Util
-import System.IO.Unsafe
+import           Control.Monad.Random       hiding (fromList)
+import           Numeric.LinearAlgebra
+import           Numeric.LinearAlgebra.Util
+import           System.IO.Unsafe
 
-import AI.Learning.Core
-import AI.Util.Matrix
+import           AI.Learning.Core
+import           AI.Util.Matrix
 
 -----------------------
 -- NN Representation --
@@ -191,7 +192,7 @@ testFwdProp = do
     let y = nnPredict nn x
     putStrLn "Predictions (should be roughly 0.0, 0.5, 1.0)"
     disp 2 y
-    
+
 testBackProp :: IO ()
 testBackProp = do
     putStrLn "***\nCompare back propagation to the MATLAB implementation.\n"
@@ -237,7 +238,7 @@ test n lambda = do
         yy = nnPredict nn xx
     putStrLn "Exclusive or:"
     disp 2 $ horzcat [xx,yy]
-    
+
 xor :: Matrix Double -> Matrix Double
 xor x = let [u,v] = toColumns x in asColumn (u + v - 2 * u * v)
-    
+

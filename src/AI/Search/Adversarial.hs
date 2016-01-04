@@ -1,13 +1,16 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances, FlexibleInstances, TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
 
 module AI.Search.Adversarial where
 
-import Control.DeepSeq
-import Control.Monad
-import Data.IORef
-import System.IO.Unsafe
+import           Control.DeepSeq
+import           Control.Monad
+import           Data.IORef
+import           System.IO.Unsafe
 
-import AI.Util.Util
+import           AI.Util.Util
 
 -- |The type used to represent utilities
 type Utility = Double
@@ -107,7 +110,7 @@ minimaxCutoff cutoff heuristic game state = a
         maxValue depth state
             | terminalTest game state = utility game state player
             | cutoff state depth      = heuristic state player
-            | otherwise               = 
+            | otherwise               =
                 maximum [ minValue (1+depth) s | (_,s) <- successors game state ]
 
 -- |Default implementation of minimaxCutoff, that uses the default heuristic
@@ -164,7 +167,7 @@ alphaBetaCutoff cutoffTest evalFn game state = a
         minValue alpha beta depth state
             | terminalTest game state = utility game state player
             | cutoffTest state depth  = evalFn state player
-            | otherwise               = 
+            | otherwise               =
                 f posInf beta (map snd $ successors game state)
                 where
                     f v beta []     = v
@@ -177,7 +180,7 @@ alphaBetaCutoff cutoffTest evalFn game state = a
         maxValue alpha beta depth state
             | terminalTest game state = utility game state player
             | cutoffTest state depth  = evalFn state player
-            | otherwise = 
+            | otherwise =
                 g negInf alpha (map snd $ successors game state)
                 where
                     g v alpha []     = v
@@ -339,7 +342,7 @@ playGameIO game p1 p2 = go (initial game)
 -- Game Statistics --
 ---------------------
 
--- |Wrapper for a game that adds semantics for collecting statistics as the 
+-- |Wrapper for a game that adds semantics for collecting statistics as the
 --  game is played.
 data GameIO g s a = GIO
     { gameIO    :: g s a

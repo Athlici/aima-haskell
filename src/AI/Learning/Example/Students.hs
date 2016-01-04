@@ -1,13 +1,13 @@
 module AI.Learning.Example.Students where
 
-import qualified Data.Map as M
-import AI.Learning.DecisionTree
+import           AI.Learning.DecisionTree
+import qualified Data.Map                 as M
 
 data Student = Student {
     firstLastYear :: Bool,
-    male :: Bool,
-    worksHard :: Bool,
-    drinks :: Bool,
+    male          :: Bool,
+    worksHard     :: Bool,
+    drinks        :: Bool,
     firstThisYear :: Bool } deriving (Eq,Ord,Show)
 
 students = [richard,alan,alison,jeff,gail,simon]

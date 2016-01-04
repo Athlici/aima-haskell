@@ -1,10 +1,10 @@
 module AI.Learning.LogisticRegression where
 
-import Numeric.LinearAlgebra
-import Numeric.LinearAlgebra.Util
+import           Numeric.LinearAlgebra
+import           Numeric.LinearAlgebra.Util
 
-import AI.Learning.Core
-import AI.Util.Matrix
+import           AI.Learning.Core
+import           AI.Util.Matrix
 
 -- |Multivariate logistic regression. Given a vector /y/ of target variables and
 --  a design matrix /x/, this function fits the parameters /theta/ of a
@@ -15,7 +15,7 @@ import AI.Util.Matrix
 --  Typically the values in the vector /y/ are either boolean (i.e. 0/1) or they
 --  represent frequency of observations, i.e. they are values between 0.0 and
 --  1.0.
--- 
+--
 --  The function fits /theta/ by numerically maximizing the likelihood function.
 --  It may be subject to overfit or non-convergence in the case where the number
 --  of observations is small or the predictors are highly correlated.
