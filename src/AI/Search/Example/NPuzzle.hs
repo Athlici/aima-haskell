@@ -1,6 +1,8 @@
-{-# LANGUAGE MultiParamTypeClasses, BangPatterns #-} --{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE BangPatterns #-}
+--{-# LANGUAGE FlexibleInstances #-}
 
---module AI.Search.Example.NPuzzle where
+module AI.Search.Example.NPuzzle where
 
 --ToDo:Fix imports
 import AI.Search.Core
@@ -16,7 +18,7 @@ import qualified Data.List as L
 import Data.Permute
 import Data.Permute.ST
 
-import System.IO
+--import System.IO
 
 import System.Random
 
@@ -93,7 +95,8 @@ puzzle8 = NP 3 [7,2,4,5,0,6,8,3,1]
 --puzzle8 = NP 3 [1,2,0,3,4,5,6,7,8]
 --puzzle8 = NP 3 [0,4,2,1,3,5,6,7,8]
 
-main = print . show $ recursiveBestFirstSearch puzzle8
+--main = print . show $ head $ iterativeDeepeningAStar puzzle8
+--main = print . show $ recursiveBestFirstSearch puzzle8
 --main = do
 --    hSetBuffering stdout NoBuffering
 --    print $ stateSpaceExploration (NP 4 [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] :: NPuzzle NPState NPMove)
@@ -120,9 +123,10 @@ toIndex' n p = rank' (toInteger n) np (inverse np) where
     rank' 1 _ _  = 0
     rank' n p pi = res s n (rank' (n-1) p' pi') where
         res !a !b c = toInteger a + toInteger b * c --this is the most ugly fix!
-        p' = runST $ unsafeThaw p  >>= \x -> unsafeSwapElems x n1 (pi `at` n1) >> unsafeFreeze x
-        pi'= runST $ unsafeThaw pi >>= \x -> unsafeSwapElems x n1 s >> unsafeFreeze x
-        s  = p `at` n1
+        p' = runST $ unsafeThaw p  >>= \x -> unsafeSwapElems x n1 si >> unsafeFreeze x
+        pi'= runST $ unsafeThaw pi >>= \x -> unsafeSwapElems x n1 s  >> unsafeFreeze x
+        s  = p  `at` n1
+        si = pi `at` n1
         n1 = fromInteger n-1
     np = runST $ unsafeFreeze =<< newCopyPermute =<< unsafeThaw p
         --manip f x = runST $ unsafeThaw x >>= \y -> f y >> unsafeFreeze y

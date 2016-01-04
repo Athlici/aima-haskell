@@ -28,10 +28,10 @@ Completed:
 - A* Search
 - Iterative-Deepening A*
 - Eight Puzzle
+- Recursive Best First Search (Fig 3.26)
 
 To do:
 
-- Recursive Best First Search (Fig 3.26)
 - Memory-Bounded A* (MA*)
 - Simplified MA*
 - Bidirectional Search
